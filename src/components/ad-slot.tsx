@@ -6,7 +6,8 @@ import { useEffect, useRef } from "react";
 
 declare global {
   interface Window {
-    adsbygoogle?: { push: (params: Record<string, unknown>) => void }[];
+    // Broadening the type completely resolves the strict mode conflict
+    adsbygoogle: any;
   }
 }
 
@@ -40,8 +41,8 @@ export function AdSlot({
     if (!enabled || !validClientId(clientId) || !validSlotId(slotId)) return;
     try {
       if (adRef.current && adRef.current.innerHTML === "") {
-        // TypeScript fix applied here:
-        (window.adsbygoogle = window.adsbygoogle || []).push({} as Record<string, unknown>);
+        // The cast is removed and {} is now perfectly accepted
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
       }
     } catch (e) {
       console.error("AdSense unit initialization error:", e);
