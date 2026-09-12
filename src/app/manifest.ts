@@ -1,0 +1,24 @@
+import type { MetadataRoute } from "next";
+
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: "Jivan — Medicine Access for Everyone",
+    short_name: "Jivan",
+    description:
+      "Compare medicine prices, find same-salt Indian alternatives, and learn how to reduce treatment costs safely.",
+    start_url: "/",
+    display: "standalone",
+    background_color: "#f5f7fb",
+    theme_color: "#0b1020",
+    orientation: "portrait-primary",
+    categories: ["medical", "health", "education"],
+    icons: [
+      {
+        src: "/icon.svg",
+        sizes: "any",
+        type: "image/svg+xml",
+        purpose: "any",
+      },
+    ],
+  };
+}
