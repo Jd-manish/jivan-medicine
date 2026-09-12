@@ -40,7 +40,8 @@ export function AdSlot({
     if (!enabled || !validClientId(clientId) || !validSlotId(slotId)) return;
     try {
       if (adRef.current && adRef.current.innerHTML === "") {
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        // TypeScript fix applied here:
+        (window.adsbygoogle = window.adsbygoogle || []).push({} as Record<string, unknown>);
       }
     } catch (e) {
       console.error("AdSense unit initialization error:", e);
