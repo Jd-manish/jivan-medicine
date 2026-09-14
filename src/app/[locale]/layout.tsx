@@ -10,6 +10,11 @@ import { SupportButton } from "@/components/support-button";
 import { getSettings } from "@/lib/settings";
 import { isValidLocale, supportedLocales, t } from "@/lib/i18n";
 
+// Localized routes read Netlify Database-backed settings and medicine data.
+// Render them at request time so deploys never depend on database access while
+// Next.js is generating static pages.
+export const dynamic = "force-dynamic";
+
 export function generateStaticParams() {
   return supportedLocales.map((locale) => ({ locale }));
 }
