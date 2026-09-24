@@ -1,12 +1,13 @@
 /**
- * Savings percentage, floored and capped at 99%.
+ * Savings percentage, floored to 1 decimal and capped at 99.9%.
  * Prevents the "-100%" rendering bug where a 99.6% gap rounded up to 100
  * and was displayed with a leading minus sign.
+ * Uses floor to never overstate savings.
  */
 export function savingsPercent(usEuPrice: number, indiaPrice: number) {
   if (!usEuPrice || usEuPrice <= 0) return 0;
   const raw = (1 - indiaPrice / usEuPrice) * 100;
-  return Math.max(0, Math.min(99, Math.floor(raw)));
+  return Math.max(0, Math.min(99.9, Math.floor(raw * 10) / 10));
 }
 
 /** How many times cheaper the Indian option is, e.g. 116 for a 116x gap. */
@@ -18,7 +19,8 @@ export function savingsMultiple(usEuPrice: number, indiaPrice: number) {
 export function savingsLabel(usEuPrice: number, indiaPrice: number) {
   const multiple = savingsMultiple(usEuPrice, indiaPrice);
   if (multiple >= 10) return `${Math.round(multiple)}× cheaper`;
-  return `Save ${savingsPercent(usEuPrice, indiaPrice)}%`;
+  const pct = savingsPercent(usEuPrice, indiaPrice);
+  return `Save ${pct % 1 === 0 ? pct.toFixed(0) : pct.toFixed(1)}%`;
 }
 
 export function formatUsd(cents: number, locale: string) {

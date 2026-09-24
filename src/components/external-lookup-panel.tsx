@@ -167,7 +167,7 @@ export function ExternalLookupPanel({ query, locale }: { query: string; locale: 
               <div className="rounded-2xl bg-gradient-to-br from-ink-900 to-ink-800 p-4 text-white">
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-white/60">You save</p>
                 <p className="mt-1 text-xl font-bold">
-                  {Math.max(0, Math.round((1 - result.price.indiaPrice! / result.price.usEuPrice!) * 100))}%
+                  {Math.max(0, Math.min(99.9, Math.floor((1 - result.price.indiaPrice! / result.price.usEuPrice!) * 1000) / 10))}%
                 </p>
               </div>
             </div>

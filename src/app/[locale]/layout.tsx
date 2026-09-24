@@ -110,6 +110,7 @@ export default async function LocaleLayout({
               <li><Link className="hover:text-mint-600" href={`/${locale}/privacy`}>{copy.navPrivacy}</Link></li>
               <li><Link className="hover:text-mint-600" href={`/${locale}/terms`}>{copy.navTerms}</Link></li>
               <li><Link className="hover:text-mint-600" href={`/${locale}/medical-disclaimer`}>{copy.navDisclaimer}</Link></li>
+              <li><Link className="hover:text-mint-600" href={`/${locale}/corrections`}>Corrections</Link></li>
             </ul>
           </div>
 

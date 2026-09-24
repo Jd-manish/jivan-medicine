@@ -18,6 +18,8 @@ import {
 } from "@/components/medical-art";
 import { MedicineSearch } from "@/components/medicine-search";
 import { formatUsd } from "@/components/price-block";
+import { AnimatedCounter } from "@/components/animated-counter";
+import { PriceShockCard } from "@/components/price-shock";
 import { SavingsCalculator } from "@/components/savings-calculator";
 import { WhyCheaper } from "@/components/why-cheaper";
 import { AdSlot } from "@/components/ad-slot";
@@ -187,13 +189,15 @@ export default async function LocalizedHomePage({
 
             <dl className="anim-rise delay-5 mt-12 grid max-w-2xl grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-4">
               {[
-                { k: stats.total.toLocaleString(), v: copy.statCatalogEntries },
-                { k: stats.salts.toLocaleString(), v: copy.statActiveMolecules },
-                { k: stats.highSaving.toLocaleString(), v: copy.statHighSaving },
-                { k: "24", v: copy.statEUUSLocales },
+                { k: stats.total, v: copy.statCatalogEntries, prefix: "" },
+                { k: stats.salts, v: copy.statActiveMolecules, prefix: "" },
+                { k: stats.highSaving, v: copy.statHighSaving, prefix: "" },
+                { k: 24, v: copy.statEUUSLocales, prefix: "" },
               ].map((stat) => (
                 <div key={stat.v}>
-                  <dt className="text-2xl font-black text-white sm:text-3xl">{stat.k}</dt>
+                  <dt className="text-2xl font-black text-white sm:text-3xl">
+                    <AnimatedCounter end={stat.k} duration={2200} prefix={stat.prefix} className="tabular-nums" />
+                  </dt>
                   <dd className="mt-1 text-xs font-medium uppercase tracking-wide text-ink-400">{stat.v}</dd>
                 </div>
               ))}
@@ -205,6 +209,49 @@ export default async function LocalizedHomePage({
           <EcgLine className="h-14 w-full" />
         </div>
       </section>
+
+      {/* ---------------- PRICE SHOCK — INTERACTIVE FLIP CARDS ---------------- */}
+      {topSavings.length > 0 && (
+        <section className="relative overflow-hidden bg-ink-900 py-12 sm:py-16">
+          <div className="shell relative">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-mint-300">
+                  💊 Interactive price comparison
+                </p>
+                <h2 className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                  Hover to reveal the India price
+                </h2>
+                <p className="mt-2 text-sm text-ink-400">
+                  Same active ingredient. Same therapeutic effect. Dramatically different prices.
+                </p>
+              </div>
+              <Link
+                href={`/${locale}/search?q=`}
+                className="btn-ghost hidden sm:inline-flex"
+              >
+                View all →
+              </Link>
+            </div>
+
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {topSavings.slice(0, 6).map((item) => (
+                <PriceShockCard
+                  key={item.id}
+                  name={item.name}
+                  genericSalt={item.genericSalt}
+                  usEuPrice={item.usEuPrice}
+                  indiaPrice={item.indiaPrice}
+                  locale={locale}
+                  slug={item.slug}
+                  packSize={item.packSize}
+                  company={item.company}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ---------------- TRUST MARQUEE ---------------- */}
       <section className="border-y border-ink-100 bg-white/70 py-5">

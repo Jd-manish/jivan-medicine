@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CapsuleArt, MoleculeArt } from "@/components/medical-art";
 import { formatUsd, PriceCompare, PriceStatusBadge, savingsPercent } from "@/components/price-block";
+import { ShareSavings, QuickShareButton } from "@/components/share-savings";
 import { isValidLocale, t } from "@/lib/i18n";
 import { P } from "@/lib/ui-panels";
 import { ui } from "@/lib/ui-core";
@@ -182,6 +183,15 @@ export default async function MedicineDetailPage({ params }: { params: Promise<P
             </section>
           </div>
 
+          {/* Share this saving — viral component */}
+          <ShareSavings
+            medicineName={medicine.name}
+            usPrice={formatUsd(medicine.usEuPrice, locale)}
+            indiaPrice={formatUsd(medicine.indiaPrice, locale)}
+            savingsPercent={savings}
+            locale={locale}
+          />
+
           <section className="panel rounded-3xl p-6 sm:p-8">
             <h2 className="text-xl font-bold text-ink-900">{ui(locale, P.medSideEffects)}</h2>
             <p className="mt-3 text-[15px] leading-7 text-ink-600">{medicine.sideEffects}</p>
@@ -228,6 +238,14 @@ export default async function MedicineDetailPage({ params }: { params: Promise<P
             <Link href={`/${locale}/search?q=${encodeURIComponent(medicine.genericSalt)}`} className="mt-3 block rounded-xl border border-ink-200 px-4 py-3 text-center text-sm font-semibold text-ink-600 transition hover:border-ink-400">
               {ui(locale, P.medCompareAll)} {medicine.genericSalt} {ui(locale, P.medOptions)}
             </Link>
+            <div className="mt-4">
+              <QuickShareButton
+                medicineName={medicine.name}
+                usPrice={formatUsd(medicine.usEuPrice, locale)}
+                indiaPrice={formatUsd(medicine.indiaPrice, locale)}
+                savingsPercent={savings}
+              />
+            </div>
             <div className="mt-5 rounded-xl bg-amber-50 p-3">
               <p className="text-xs leading-5 text-amber-800">
                 {ui(locale, medicine.prescriptionRequired ? P.medRxWarn : P.medOtcWarn)}
