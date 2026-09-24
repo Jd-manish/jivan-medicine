@@ -1,13 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { AdSlot } from "@/components/ad-slot";
 import { MoleculeArt } from "@/components/medical-art";
 import { articleCategories, articles, getArticlesByCategory, type ArticleCategory } from "@/lib/articles";
 import { isValidLocale, supportedLocales } from "@/lib/i18n";
-import { getSettings } from "@/lib/settings";
 
-export const revalidate = 3600;
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://jivan.health";
 
@@ -45,20 +42,14 @@ export async function generateMetadata({
 
 export default async function ArticlesPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: SearchParams;
 }) {
   const { locale } = await params;
-  if (!isValidLocale(locale)) notFound();
 
-  const sp = await searchParams;
-  const requested = (sp.category ?? "All") as ArticleCategory;
-  const activeCategory: ArticleCategory = articleCategories.includes(requested) ? requested : "All";
+  const activeCategory: ArticleCategory = "All";
 
-  const settings = await getSettings();
-  const adsEnabled = settings.ads_enabled === "true";
+  const adsEnabled = false;
 
   const list = getArticlesByCategory(activeCategory);
   const [featured, ...rest] = list;
@@ -163,8 +154,8 @@ export default async function ArticlesPage({
 
         <AdSlot
           enabled={adsEnabled}
-          clientId={settings.ads_client_id}
-          slotId={settings.ads_slot_article}
+          clientId={""}
+          slotId={""}
           placement="articles-top"
           className="!px-0 py-8"
         />

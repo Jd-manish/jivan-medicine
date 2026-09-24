@@ -8,6 +8,7 @@ type MedicineRow = {
   id: number;
   slug: string;
   name: string;
+  brandNames?: string;
   category: string;
   therapyArea: string;
   form: string;
@@ -19,8 +20,9 @@ type MedicineRow = {
   usEuPrice: number;
   indiaPrice: number;
   priceStatus: string;
-  priceNotes: string;
-  prescriptionRequired: boolean;
+  priceNotes?: string;
+  prescriptionRequired?: boolean;
+  highSaving?: boolean;
 };
 
 type CatalogResponse = {
@@ -87,24 +89,49 @@ export function MedicineSearch({
     [locale],
   );
 
+  // Load full catalog from static JSON on mount
+  const [allRows, setAllRows] = useState<MedicineRow[]>([]);
   useEffect(() => {
-    const handle = setTimeout(async () => {
-      setLoading(true);
-      const params = new URLSearchParams({
-        search: query,
-        category: activeCategory === copy.allCategories ? "All" : activeCategory,
-        page: String(page),
-        pageSize: "24",
-      });
+    fetch("/data/medicines.json")
+      .then((r) => r.json())
+      .then((data: MedicineRow[]) => setAllRows(data))
+      .catch(() => {});
+  }, []);
 
-      const res = await fetch(`/api/medicines?${params.toString()}`, { cache: "no-store" });
-      const json = (await res.json()) as CatalogResponse;
-      setCatalog(json);
+  // Client-side filtering and pagination (no API needed)
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      setLoading(true);
+      const cat = activeCategory === copy.allCategories ? "All" : activeCategory;
+      const search = query.trim().toLowerCase();
+
+      let filtered = allRows.length > 0 ? allRows : initialData.rows;
+
+      if (search) {
+        filtered = filtered.filter((m) =>
+          m.name.toLowerCase().includes(search) ||
+          m.genericSalt.toLowerCase().includes(search) ||
+          m.brandNames?.toLowerCase().includes(search) ||
+          m.company.toLowerCase().includes(search) ||
+          m.useCases?.toLowerCase().includes(search)
+        );
+      }
+
+      if (cat !== "All") {
+        filtered = filtered.filter((m) => m.category === cat);
+      }
+
+      const total = filtered.length;
+      const pageSize = 24;
+      const totalPages = Math.max(1, Math.ceil(total / pageSize));
+      const rows = filtered.slice((page - 1) * pageSize, page * pageSize);
+
+      setCatalog({ total, page, pageSize, totalPages, rows });
       setLoading(false);
-    }, 280);
+    }, 150);
 
     return () => clearTimeout(handle);
-  }, [activeCategory, copy.allCategories, page, query]);
+  }, [activeCategory, copy.allCategories, page, query, allRows, initialData.rows]);
 
   useEffect(() => {
     setPage(1);

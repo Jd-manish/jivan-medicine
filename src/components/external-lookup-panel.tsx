@@ -62,23 +62,79 @@ export function ExternalLookupPanel({ query, locale }: { query: string; locale: 
     (async () => {
       setState("loading");
       try {
-        const res = await fetch(`/api/medicines/lookup?q=${encodeURIComponent(query)}`, { cache: "no-store" });
-        const json = (await res.json()) as { ok: boolean; result?: LookupResult };
+        // Call external APIs directly from the client (all support CORS)
+        const term = encodeURIComponent(query);
+        const [fdaRes, wikiRes] = await Promise.allSettled([
+          fetch(`https://api.fda.gov/drug/label.json?search=openfda.generic_name:"${term}"&limit=1`).then(r => r.ok ? r.json() : null),
+          fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${term}`).then(r => r.ok ? r.json() : null),
+        ]);
+
         if (cancelled) return;
-        if (json.ok && json.result) {
-          setResult(json.result);
-          setState("done");
-        } else {
-          setState("error");
-        }
+
+        const fda = fdaRes.status === "fulfilled" ? fdaRes.value : null;
+        const wiki = wikiRes.status === "fulfilled" ? wikiRes.value : null;
+
+        // Try to find matching medicine in our static catalog
+        let priceData: LookupResult["price"] = { usEuPrice: null, indiaPrice: null, basis: "No verified Indian market price available yet.", confidence: "unavailable" };
+        let alternatives: LookupResult["indianAlternatives"] = [];
+
+        try {
+          const catRes = await fetch("/data/medicines.json");
+          const all = await catRes.json();
+          const q = query.toLowerCase();
+          const matches = all.filter((m: any) =>
+            m.name.toLowerCase().includes(q) ||
+            m.genericSalt.toLowerCase().includes(q) ||
+            m.brandNames?.toLowerCase().includes(q)
+          ).slice(0, 8);
+
+          if (matches.length > 0) {
+            const ref = matches.find((m: any) => m.priceStatus === "market_checked") || matches[0];
+            priceData = {
+              usEuPrice: ref.usEuPrice,
+              indiaPrice: ref.indiaPrice,
+              confidence: ref.priceStatus === "market_checked" ? "referenced" : "derived",
+              anchorName: `${ref.name} · ${ref.packSize}`,
+              basis: ref.priceStatus === "market_checked"
+                ? `Matched to Jivan dataset (${ref.name}). Indian figure reflects typical retail market price.`
+                : `Derived from a referenced anchor (${ref.name}).`,
+            };
+            alternatives = matches.slice(0, 6).map((m: any) => ({
+              slug: m.slug, name: m.name, company: m.company, strength: m.strength,
+              indiaPrice: m.indiaPrice, usEuPrice: m.usEuPrice, priceStatus: m.priceStatus,
+            }));
+          }
+        } catch {}
+
+        const result: LookupResult = {
+          found: !!(fda || wiki),
+          title: wiki?.title || fda?.openfda?.generic_name?.[0] || query,
+          genericSalt: fda?.openfda?.generic_name?.[0] || query,
+          brandNames: fda?.openfda?.brand_name?.slice(0, 6) ?? [],
+          doseForms: [],
+          summary: wiki?.extract || "",
+          uses: (fda?.results?.[0]?.indications_and_usage ?? []).join(" ").split(/(?<=\.)\s+/).slice(0, 4),
+          dosage: (fda?.results?.[0]?.dosage_and_administration ?? []).join(" ").split(/(?<=\.)\s+/).slice(0, 4),
+          pros: ["Same active pharmaceutical ingredient as the internationally branded product.", "Indian manufacturing scale can reduce patient price dramatically."],
+          cons: ["Requires a valid prescription and physician supervision.", "Import rules differ by country and must be checked."],
+          sideEffects: (fda?.results?.[0]?.adverse_reactions ?? []).join(" ").split(/(?<=\.)\s+/).slice(0, 4),
+          warnings: (fda?.results?.[0]?.warnings_and_cautions ?? []).join(" ").split(/(?<=\.)\s+/).slice(0, 4),
+          price: priceData,
+          indianAlternatives: alternatives,
+          sources: [
+            ...(fda ? [{ label: "openFDA drug label", url: "https://open.fda.gov/apis/drug/label/" }] : []),
+            ...(wiki ? [{ label: "Wikipedia", url: wiki.content_urls?.desktop?.page || "" }] : []),
+          ],
+        };
+
+        setResult(result);
+        setState("done");
       } catch {
         if (!cancelled) setState("error");
       }
     })();
 
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [query]);
 
   if (state === "loading") {

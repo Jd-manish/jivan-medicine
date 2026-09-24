@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { CapsuleArt, MoleculeArt } from "@/components/medical-art";
 import { formatUsd, PriceCompare, PriceStatusBadge, savingsPercent } from "@/components/price-block";
 import { ShareSavings, QuickShareButton } from "@/components/share-savings";
@@ -9,8 +8,20 @@ import { P } from "@/lib/ui-panels";
 import { ui } from "@/lib/ui-core";
 import { ensureMedicineSeeded, getAlternatives, getMedicineBySlug } from "@/lib/medicines";
 
-export const revalidate = 3600;
-export const dynamicParams = true;
+export const dynamicParams = false;
+
+export async function generateStaticParams() {
+  const { getMedicineCatalog } = await import("@/lib/medicines");
+  const locales = ["en", "de", "fr", "es", "it"] as const;
+  const { rows } = await getMedicineCatalog({ verifiedOnly: true, pageSize: 500, sort: "savings" });
+  const params: PageParams[] = [];
+  for (const locale of locales) {
+    for (const m of rows) {
+      params.push({ locale, slug: m.slug });
+    }
+  }
+  return params;
+}
 
 type PageParams = { locale: string; slug: string };
 
@@ -19,7 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   if (!isValidLocale(locale)) return {};
   await ensureMedicineSeeded();
 
-  const medicine = await getMedicineBySlug(slug);
+  const medicine = (await getMedicineBySlug(slug))!;
   if (!medicine) return {};
 
   const savings = savingsPercent(medicine.usEuPrice, medicine.indiaPrice);
@@ -49,13 +60,13 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
 
 export default async function MedicineDetailPage({ params }: { params: Promise<PageParams> }) {
   const { locale, slug } = await params;
-  if (!isValidLocale(locale)) notFound();
+  
   await ensureMedicineSeeded();
 
-  const medicine = await getMedicineBySlug(slug);
-  if (!medicine) notFound();
+  const medicine = (await getMedicineBySlug(slug))!;
+  
 
-  const copy = t(locale);
+  const copy = t(locale as any);
   const alternatives = await getAlternatives(medicine.genericSalt, medicine.id, 6);
   const savings = savingsPercent(medicine.usEuPrice, medicine.indiaPrice);
 

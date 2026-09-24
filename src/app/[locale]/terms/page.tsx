@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { isValidLocale, supportedLocales } from "@/lib/i18n";
 
-export const revalidate = 86400;
 
 export async function generateMetadata({
   params,
@@ -97,7 +95,7 @@ const sections = [
 
 export default async function TermsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  if (!isValidLocale(locale)) notFound();
+  
 
   return (
     <>

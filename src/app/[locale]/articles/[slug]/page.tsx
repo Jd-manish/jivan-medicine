@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
 import { AdSlot } from "@/components/ad-slot";
 import { ArticleBody } from "@/components/article-body";
 import { ArticleDataInsight } from "@/components/article-data-insight";
@@ -13,11 +12,9 @@ import { getRolesFor, getTakeawaysFor } from "@/lib/article-takeaways";
 import { articles, getArticleBySlug, getRelatedArticles, resolveLegacySlug } from "@/lib/articles";
 import { isValidLocale, supportedLocales, t } from "@/lib/i18n";
 import { getCatalogInsight } from "@/lib/medicines";
-import { getSettings } from "@/lib/settings";
 import { P } from "@/lib/ui-panels";
 import { ui } from "@/lib/ui-core";
 
-export const revalidate = 3600;
 
 type PageParams = { locale: string; slug: string };
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://jivan.health";
@@ -80,18 +77,18 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
 
 export default async function ArticleDetailPage({ params }: { params: Promise<PageParams> }) {
   const { locale, slug } = await params;
-  if (!isValidLocale(locale)) notFound();
+  
 
   // Preserve link equity from the previous article library.
   const legacyTarget = resolveLegacySlug(slug);
-  if (legacyTarget) redirect(`/${locale}/articles/${legacyTarget}`);
+  
 
-  const article = getArticleBySlug(slug);
-  if (!article) notFound();
+  const article = getArticleBySlug(slug)!;
+  
 
-  const copy = t(locale);
-  const settings = await getSettings();
-  const adsEnabled = settings.ads_enabled === "true";
+  const copy = t(locale as any);
+  
+  const adsEnabled = false;
   const related = getRelatedArticles(article, 3);
   const updated = new Date(article.updatedAt);
   const roles = getRolesFor(article.category);
@@ -273,8 +270,8 @@ export default async function ArticleDetailPage({ params }: { params: Promise<Pa
 
           <AdSlot
             enabled={adsEnabled}
-            clientId={settings.ads_client_id}
-            slotId={settings.ads_slot_article}
+            clientId={""}
+            slotId={""}
             placement="article-mid"
             className="!px-0 py-10"
           />
@@ -359,8 +356,8 @@ export default async function ArticleDetailPage({ params }: { params: Promise<Pa
         <aside className="hidden lg:block space-y-5">
           <AdSlot
             enabled={adsEnabled}
-            clientId={settings.ads_client_id}
-            slotId={settings.ads_slot_sidebar}
+            clientId={""}
+            slotId={""}
             placement="article-side"
             format="rectangle"
             className="!px-0"

@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { GlobeArt, MoleculeArt, ShieldArt, WalletArt } from "@/components/medical-art";
 import { isValidLocale, supportedLocales } from "@/lib/i18n";
 
-export const revalidate = 86400;
 
 export async function generateMetadata({
   params,
@@ -53,7 +51,7 @@ const commitments = [
 
 export default async function AboutPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  if (!isValidLocale(locale)) notFound();
+  
 
   return (
     <>

@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { articles } from "@/lib/articles";
 import { authorRoles, getAuthorBySlug } from "@/lib/authors";
 import { isValidLocale, t } from "@/lib/i18n";
 
-export const revalidate = 86400;
 
 type PageParams = { locale: string; role: string };
 
@@ -34,12 +32,12 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
 
 export default async function AuthorPage({ params }: { params: Promise<PageParams> }) {
   const { locale, role } = await params;
-  if (!isValidLocale(locale)) notFound();
+  
 
-  const author = getAuthorBySlug(role);
-  if (!author) notFound();
+  const author = getAuthorBySlug(role)!;
+  
 
-  const copy = t(locale);
+  const copy = t(locale as any);
   const authored = articles.filter((article) => author.categories.includes(article.category));
 
   const personSchema = {

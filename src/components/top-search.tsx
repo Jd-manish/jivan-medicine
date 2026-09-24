@@ -39,6 +39,9 @@ export function TopSearch({
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
+  // Lightweight in-memory suggestion index — loaded once from static JSON
+  const indexRef = useRef<Suggestion[] | null>(null);
+
   useEffect(() => {
     if (query.trim().length < 2) {
       setItems([]);
@@ -48,9 +51,27 @@ export function TopSearch({
     const handle = setTimeout(async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/medicines/suggest?q=${encodeURIComponent(query)}`, { cache: "no-store" });
-        const json = (await res.json()) as { items: Suggestion[] };
-        setItems(json.items ?? []);
+        // Load the static catalog once and cache it
+        if (!indexRef.current) {
+          try {
+            const res = await fetch("/data/medicines.json");
+            const all = (await res.json()) as Suggestion[];
+            // Keep only market_checked entries for suggestions (smaller, faster)
+            indexRef.current = all.filter((m: any) => m.priceStatus === "market_checked").slice(0, 500);
+          } catch {
+            indexRef.current = [];
+          }
+        }
+
+        const term = query.trim().toLowerCase();
+        const matches = (indexRef.current ?? [])
+          .filter((m) =>
+            m.name.toLowerCase().includes(term) ||
+            m.genericSalt.toLowerCase().includes(term)
+          )
+          .slice(0, 8);
+
+        setItems(matches);
         setOpen(true);
       } finally {
         setLoading(false);

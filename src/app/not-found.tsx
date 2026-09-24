@@ -3,12 +3,9 @@ import { BrandLogo } from "@/components/brand-logo";
 import { CapsuleArt, MoleculeArt } from "@/components/medical-art";
 import { P } from "@/lib/ui-panels";
 import { ui } from "@/lib/ui-core";
-import { getPreferredLocale } from "@/lib/i18n";
-import { headers } from "next/headers";
 
-export default async function NotFound() {
-  const headersList = await headers();
-  const locale = getPreferredLocale(headersList.get("accept-language"));
+export default function NotFound() {
+  const locale = "en";
 
   return (
     <main className="hero-aurora grid min-h-screen place-items-center overflow-hidden px-4 py-12 text-center">

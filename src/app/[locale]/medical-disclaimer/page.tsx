@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { isValidLocale } from "@/lib/i18n";
 
 export const metadata: Metadata = {
@@ -9,7 +8,7 @@ export const metadata: Metadata = {
 
 export default async function MedicalDisclaimerPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  if (!isValidLocale(locale)) notFound();
+  
 
   return (
     <section className="shell panel my-12 rounded-3xl p-6 sm:p-9">

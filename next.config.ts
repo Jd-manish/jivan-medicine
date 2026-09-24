@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Static export — no server runtime needed. Deploys to any static host.
+  output: "export",
+
   // Smaller, faster responses and no framework fingerprinting.
   compress: true,
   poweredByHeader: false,
@@ -9,6 +12,14 @@ const nextConfig: NextConfig = {
   // Strip console output from production bundles (keep errors for diagnostics).
   compiler: {
     removeConsole: process.env.NODE_ENV === "production" ? { exclude: ["error", "warn"] } : false,
+  },
+
+  // Trailing slashes for static hosting compatibility.
+  trailingSlash: true,
+
+  // Images must be unoptimized for static export (no server-side image optimization).
+  images: {
+    unoptimized: true,
   },
 
   async headers() {

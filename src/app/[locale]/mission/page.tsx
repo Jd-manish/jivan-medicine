@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { GlobeArt, MoleculeArt, ShieldArt, WalletArt } from "@/components/medical-art";
 import { isValidLocale } from "@/lib/i18n";
 
@@ -35,7 +34,7 @@ const principles = [
 
 export default async function MissionPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  if (!isValidLocale(locale)) notFound();
+  
 
   return (
     <>

@@ -1,6 +1,6 @@
-import { db } from "@/db";
-import { siteSettings } from "@/db/schema";
-import { sql } from "drizzle-orm";
+/**
+ * Site settings — hardcoded defaults. No database required.
+ */
 
 export const SETTING_KEYS = [
   "support_enabled",
@@ -31,7 +31,7 @@ export const defaultSettings: SettingsMap = {
   support_enabled: "true",
   support_headline: "Help us keep Jivan free for everyone",
   support_message:
-    "Jivan is run as a public-service project. We take no commission, sell nothing and show no paid placements. Server, database and research costs are paid out of pocket. If this platform saved you money, a small contribution helps us keep it free for the next family who needs it.",
+    "Jivan is run as a public-service project. We take no commission, sell nothing and show no paid placements. Server and research costs are paid out of pocket. If this platform saved you money, a small contribution helps us keep it free for the next family who needs it.",
   support_upi: "",
   support_bank_name: "",
   support_account_name: "",
@@ -51,32 +51,9 @@ export const defaultSettings: SettingsMap = {
 };
 
 export async function getSettings(): Promise<SettingsMap> {
-  try {
-    const rows = await db.select().from(siteSettings);
-    const map = { ...defaultSettings };
-    for (const row of rows) {
-      if ((SETTING_KEYS as readonly string[]).includes(row.key)) {
-        map[row.key as SettingKey] = row.value;
-      }
-    }
-    return map;
-  } catch {
-    return { ...defaultSettings };
-  }
+  return { ...defaultSettings };
 }
 
-export async function saveSettings(values: Partial<SettingsMap>) {
-  const entries = Object.entries(values).filter(([key]) =>
-    (SETTING_KEYS as readonly string[]).includes(key),
-  );
-
-  for (const [key, value] of entries) {
-    await db
-      .insert(siteSettings)
-      .values({ key, value: String(value ?? "") })
-      .onConflictDoUpdate({
-        target: siteSettings.key,
-        set: { value: String(value ?? ""), updatedAt: sql`now()` },
-      });
-  }
+export async function saveSettings(_values: Partial<SettingsMap>) {
+  // No-op — settings are hardcoded for static deployment.
 }

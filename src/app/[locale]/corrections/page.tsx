@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { CapsuleArt, ShieldArt } from "@/components/medical-art";
 import { isValidLocale, t } from "@/lib/i18n";
 import { P } from "@/lib/ui-panels";
 import { ui } from "@/lib/ui-core";
 
-export const dynamic = "force-dynamic";
+
 
 export const metadata: Metadata = {
   title: "Corrections & Retractions — Jivan",
@@ -20,7 +19,7 @@ export default async function CorrectionsPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  if (!isValidLocale(locale)) notFound();
+  
 
   return (
     <>

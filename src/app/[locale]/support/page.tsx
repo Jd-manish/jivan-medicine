@@ -1,25 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { GlobeArt, MoleculeArt, ShieldArt, WalletArt } from "@/components/medical-art";
 import { isValidLocale } from "@/lib/i18n";
 import { P } from "@/lib/ui-panels";
 import { ui } from "@/lib/ui-core";
-import { getSettings } from "@/lib/settings";
-
-export const dynamic = "force-dynamic";
+import { defaultSettings } from "@/lib/settings";
 
 export const metadata: Metadata = {
   title: "Support Jivan — help keep medicine pricing free",
   description:
-    "Jivan is a free, non-commercial medicine price transparency platform. Voluntary contributions cover servers, database and research costs so the service stays free for every patient.",
+    "Jivan is a free, non-commercial medicine price transparency platform. Voluntary contributions cover server and research costs so the service stays free for every patient.",
 };
 
 export default async function SupportPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  if (!isValidLocale(locale)) notFound();
 
-  const s = await getSettings();
+  const s = defaultSettings;
 
   const payments: { label: string; value: string }[] = [
     { label: "UPI ID", value: s.support_upi },
@@ -58,23 +54,23 @@ export default async function SupportPage({ params }: { params: Promise<{ locale
           {costs.map((item) => (
             <article key={item.t.en} className="panel panel-hover rounded-3xl p-6">
               {item.icon}
-              <h2 className="mt-4 text-base font-bold text-ink-900">{ui(locale, item.t)}</h2>
-              <p className="mt-2 text-sm leading-6 text-ink-600">{ui(locale, item.d)}</p>
+              <h2 className="mt-4 text-base font-bold text-ink-900">{ui(locale as any, item.t)}</h2>
+              <p className="mt-2 text-sm leading-6 text-ink-600">{ui(locale as any, item.d)}</p>
             </article>
           ))}
         </section>
 
         <section className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px]">
           <div className="panel rounded-3xl p-6 sm:p-8">
-            <h2 className="text-2xl font-bold text-ink-900">{ui(locale, P.supDetailsTitle)}</h2>
+            <h2 className="text-2xl font-bold text-ink-900">{ui(locale as any, P.supDetailsTitle)}</h2>
 
             {payments.length === 0 && !s.support_qr_url ? (
               <div className="mt-4 rounded-2xl bg-amber-50 p-5">
                 <p className="text-sm leading-6 text-amber-800">
-                  {ui(locale, P.supEmpty)}
+                  Payment details are not configured yet. Contact the admin for contribution details.
                 </p>
                 <Link href={`/${locale}/contact`} className="btn-primary mt-4">
-                  {ui(locale, P.supContact)}
+                  Contact us
                 </Link>
               </div>
             ) : (
@@ -99,25 +95,25 @@ export default async function SupportPage({ params }: { params: Promise<{ locale
           <aside className="space-y-5">
             {s.support_qr_url ? (
               <div className="panel rounded-3xl p-6 text-center">
-                <h3 className="text-sm font-bold uppercase tracking-wide text-ink-400">{ui(locale, P.supQrTitle)}</h3>
+                <h3 className="text-sm font-bold uppercase tracking-wide text-ink-400">QR Code</h3>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={s.support_qr_url}
-                  alt={ui(locale, P.supQrAlt)}
+                  alt="Payment QR code"
                   className="mx-auto mt-4 h-48 w-48 rounded-2xl border border-ink-100 object-contain"
                 />
               </div>
             ) : null}
 
             <div className="panel rounded-3xl p-6">
-              <h3 className="text-sm font-bold uppercase tracking-wide text-ink-400">{ui(locale, P.supOtherTitle)}</h3>
+              <h3 className="text-sm font-bold uppercase tracking-wide text-ink-400">Other ways to help</h3>
               <ul className="mt-3 space-y-2.5 text-sm leading-6 text-ink-600">
-                <li>{ui(locale, P.supOther1)}</li>
-                <li>{ui(locale, P.supOther2)}</li>
-                <li>{ui(locale, P.supOther3)}</li>
+                <li>Share Jivan with someone who needs it</li>
+                <li>Report a pricing error</li>
+                <li>Suggest a medicine to add</li>
               </ul>
               <Link href={`/${locale}/contact`} className="mt-4 block rounded-xl border border-ink-200 px-4 py-2.5 text-center text-sm font-semibold text-ink-600 hover:border-ink-400">
-                {ui(locale, P.supFeedback)}
+                Get in touch
               </Link>
             </div>
           </aside>

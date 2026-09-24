@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { FaqAccordion, type FaqItem } from "@/components/faq-accordion";
-import { FeedbackSection } from "@/components/feedback-section";
-import { LeadForm } from "@/components/lead-form";
 import {
   CapsuleArt,
   EcgLine,
@@ -23,7 +20,6 @@ import { PriceShockCard } from "@/components/price-shock";
 import { SavingsCalculator } from "@/components/savings-calculator";
 import { WhyCheaper } from "@/components/why-cheaper";
 import { AdSlot } from "@/components/ad-slot";
-import { getSettings } from "@/lib/settings";
 import { TopSearch } from "@/components/top-search";
 import { articles } from "@/lib/articles";
 import {
@@ -37,8 +33,8 @@ import { isValidLocale, supportedLocales, t } from "@/lib/i18n";
 import { U, ui } from "@/lib/ui-core";
 import { P } from "@/lib/ui-panels";
 
-// Incrementally regenerated: fast CDN-cached HTML, refreshed every 5 minutes.
-export const revalidate = 300;
+// Fully static — no DB, no server runtime needed.
+export const dynamic = "force-static";
 
 export async function generateMetadata({
   params,
@@ -48,7 +44,7 @@ export async function generateMetadata({
   const { locale } = await params;
   if (!isValidLocale(locale)) return {};
 
-  const copy = t(locale);
+  const copy = t(locale as any);
 
   return {
     title: "Compare Medicine Prices & Indian Generic Alternatives",
@@ -110,19 +106,14 @@ export default async function LocalizedHomePage({
 }) {
   const { locale } = await params;
 
-  if (!isValidLocale(locale)) {
-    notFound();
-  }
-
   await ensureMedicineSeeded();
-  const [initialCatalog, topSavings, stats, settings] = await Promise.all([
+  const [initialCatalog, topSavings, stats] = await Promise.all([
     getMedicineCatalog({ page: 1, pageSize: 24 }),
     getTopSavings(6),
     getInventoryStats(),
-    getSettings(),
   ]);
-  const adsEnabled = settings.ads_enabled === "true";
-  const copy = t(locale);
+  const adsEnabled = false;
+  const copy = t(locale as any);
   const featuredArticles = articles.slice(0, 6);
   const filterCategories = medicineCategories.filter((item) => item !== "All");
 
@@ -398,8 +389,8 @@ export default async function LocalizedHomePage({
 
       <AdSlot
         enabled={adsEnabled}
-        clientId={settings.ads_client_id}
-        slotId={settings.ads_slot_home}
+        clientId={""}
+        slotId={""}
         placement="home-mid"
         className="pb-6"
       />
@@ -458,13 +449,10 @@ export default async function LocalizedHomePage({
         </div>
       </section>
 
-      {/* ---------------- SAVINGS + LEAD ---------------- */}
+      {/* ---------------- SAVINGS CALCULATOR ---------------- */}
       <section id="savings" className="shell scroll-mt-24 py-16 sm:py-20">
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="mx-auto max-w-xl">
           <SavingsCalculator locale={locale} />
-          <div id="quote" className="scroll-mt-24">
-            <LeadForm locale={locale} />
-          </div>
         </div>
       </section>
 
@@ -493,9 +481,6 @@ export default async function LocalizedHomePage({
           pricingEstimated: copy.pricingEstimated,
         }}
       />
-
-      {/* ---------------- FEEDBACK (live, admin-moderated) ---------------- */}
-      <FeedbackSection locale={locale} />
 
       {/* ---------------- ARTICLES ---------------- */}
       <section className="shell py-4 sm:py-6">
@@ -548,8 +533,8 @@ export default async function LocalizedHomePage({
 
       <AdSlot
         enabled={adsEnabled}
-        clientId={settings.ads_client_id}
-        slotId={settings.ads_slot_home}
+        clientId={""}
+        slotId={""}
         placement="home-footer"
         className="pb-10"
       />

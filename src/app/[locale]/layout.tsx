@@ -1,19 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { AdsenseLoader } from "@/components/ad-slot";
 import { BrandLogo } from "@/components/brand-logo";
 import { SiteHeader } from "@/components/site-header";
 import { SupportButton } from "@/components/support-button";
-import { getSettings } from "@/lib/settings";
 import { isValidLocale, supportedLocales, t } from "@/lib/i18n";
 
-// Localized routes read Netlify Database-backed settings and medicine data.
-// Render them at request time so deploys never depend on database access while
-// Next.js is generating static pages.
-export const dynamic = "force-dynamic";
+// Fully static — no DB, no server runtime needed.
 
 export function generateStaticParams() {
   return supportedLocales.map((locale) => ({ locale }));
@@ -25,11 +20,11 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  if (!isValidLocale(locale)) {
+  if (false) {
     return {};
   }
 
-  const copy = t(locale);
+  const copy = t(locale as any);
 
   return {
     title: {
@@ -49,12 +44,10 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params;
 
-  if (!isValidLocale(locale)) {
-    notFound();
-  }
-
-  const copy = t(locale);
-  const settings = await getSettings();
+  const copy = t(locale as any);
+  // Static deployment — no DB settings needed
+  const adsEnabled = false;
+  const adsClientId = "";
 
   const navItems = [
     { href: `/${locale}`, label: copy.navHome },
@@ -94,9 +87,7 @@ export default async function LocaleLayout({
               <li><Link className="hover:text-mint-600" href={`/${locale}#catalog`}>{copy.navMedicines}</Link></li>
               <li><Link className="hover:text-mint-600" href={`/${locale}#savings`}>Savings estimator</Link></li>
               <li><Link className="hover:text-mint-600" href={`/${locale}/articles`}>{copy.navArticles}</Link></li>
-              <li><Link className="hover:text-mint-600" href={`/${locale}/data`}>Our dataset</Link></li>
               <li><Link className="hover:text-mint-600" href={`/${locale}/support`}>Support us</Link></li>
-              <li><Link className="hover:text-mint-600" href={`/${locale}/admin`}>Admin</Link></li>
             </ul>
           </div>
 
@@ -138,9 +129,9 @@ export default async function LocaleLayout({
         </div>
       </footer>
 
-      {settings.support_enabled === "true" ? <SupportButton locale={locale} /> : null}
+      <SupportButton locale={locale} />
       <MobileBottomNav locale={locale} />
-      <AdsenseLoader enabled={settings.ads_enabled === "true"} clientId={settings.ads_client_id} />
+      <AdsenseLoader enabled={adsEnabled} clientId={adsClientId} />
     </div>
   );
 }
