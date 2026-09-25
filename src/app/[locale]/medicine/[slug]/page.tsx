@@ -79,6 +79,24 @@ export default async function MedicineDetailPage({ params }: { params: Promise<P
     dosageForm: medicine.form,
     description: medicine.description,
     prescriptionStatus: medicine.prescriptionRequired ? "PrescriptionOnly" : "OTC",
+    offers: {
+      "@type": "AggregateOffer",
+      lowPrice: Math.round(medicine.indiaPrice / 100),
+      highPrice: Math.round(medicine.usEuPrice / 100),
+      priceCurrency: "USD",
+      offerCount: alternatives.length + 1,
+      availability: "https://schema.org/InStock",
+    },
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `https://jivan.health/${locale}` },
+      { "@type": "ListItem", position: 2, name: "Medicines", item: `https://jivan.health/${locale}/search` },
+      { "@type": "ListItem", position: 3, name: medicine.name },
+    ],
   };
 
   const facts = [
@@ -95,6 +113,7 @@ export default async function MedicineDetailPage({ params }: { params: Promise<P
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
 
       <section className="hero-aurora relative overflow-hidden">
         <div className="grid-lines absolute inset-0" />

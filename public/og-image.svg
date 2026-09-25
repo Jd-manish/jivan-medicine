@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b1020"/>
+      <stop offset="54%" stop-color="#17233e"/>
+      <stop offset="100%" stop-color="#0d2b34"/>
+    </linearGradient>
+    <linearGradient id="mint" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6ee7c7"/>
+      <stop offset="100%" stop-color="#12b98c"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  
+  <!-- Decorative circles -->
+  <circle cx="1000" cy="80" r="300" fill="rgba(61,125,251,0.15)"/>
+  <circle cx="150" cy="550" r="250" fill="rgba(18,185,140,0.12)"/>
+  
+  <!-- Grid lines -->
+  <g opacity="0.04" stroke="white" stroke-width="1">
+    <line x1="0" y1="0" x2="0" y2="630"/>
+    <line x1="46" y1="0" x2="46" y2="630"/>
+    <line x1="92" y1="0" x2="92" y2="630"/>
+    <line x1="138" y1="0" x2="138" y2="630"/>
+    <line x1="184" y1="0" x2="184" y2="630"/>
+    <line x1="0" y1="46" x2="1200" y2="46"/>
+    <line x1="0" y1="92" x2="1200" y2="92"/>
+    <line x1="0" y1="138" x2="1200" y2="138"/>
+  </g>
+  
+  <!-- Logo -->
+  <rect x="80" y="72" width="76" height="76" rx="20" fill="url(#mint)"/>
+  <text x="118" y="125" font-family="Arial,sans-serif" font-size="48" font-weight="900" fill="#08131b" text-anchor="middle">J</text>
+  
+  <!-- Brand name -->
+  <text x="175" y="120" font-family="Arial,sans-serif" font-size="48" font-weight="900" fill="white" letter-spacing="-2">Jivan</text>
+  
+  <!-- Main headline -->
+  <text x="80" y="240" font-family="Arial,sans-serif" font-size="72" font-weight="900" fill="white" letter-spacing="-3">Same molecule.</text>
+  <text x="80" y="330" font-family="Arial,sans-serif" font-size="72" font-weight="900" letter-spacing="-3">
+    <tspan fill="url(#mint)">A fraction</tspan>
+    <tspan fill="white"> of the price.</tspan>
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="80" y="400" font-family="Arial,sans-serif" font-size="28" fill="#cbd6e8">Compare medicine prices and discover lower-cost</text>
+  <text x="80" y="438" font-family="Arial,sans-serif" font-size="28" fill="#cbd6e8">Indian same-salt alternatives with transparent sources.</text>
+  
+  <!-- Stats bar -->
+  <text x="80" y="540" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="#8ff0d3">13,700+ catalog entries</text>
+  <text x="400" y="540" font-family="Arial,sans-serif" font-size="22" fill="rgba(255,255,255,0.3)">•</text>
+  <text x="430" y="540" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="#8ff0d3">Physician-first guidance</text>
+  <text x="720" y="540" font-family="Arial,sans-serif" font-size="22" fill="rgba(255,255,255,0.3)">•</text>
+  <text x="750" y="540" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="#8ff0d3">Free for everyone</text>
+  
+  <!-- URL -->
+  <text x="80" y="590" font-family="Arial,sans-serif" font-size="18" fill="rgba(255,255,255,0.5)">jivan.health</text>
+</svg>

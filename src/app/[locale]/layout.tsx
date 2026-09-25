@@ -6,6 +6,7 @@ import { AdsenseLoader } from "@/components/ad-slot";
 import { BrandLogo } from "@/components/brand-logo";
 import { SiteHeader } from "@/components/site-header";
 import { SupportButton } from "@/components/support-button";
+import { BackToTop } from "@/components/back-to-top";
 import { isValidLocale, supportedLocales, t } from "@/lib/i18n";
 
 // Fully static — no DB, no server runtime needed.
@@ -130,6 +131,7 @@ export default async function LocaleLayout({
       </footer>
 
       <SupportButton locale={locale} />
+      <BackToTop />
       <MobileBottomNav locale={locale} />
       <AdsenseLoader enabled={adsEnabled} clientId={adsClientId} />
     </div>
