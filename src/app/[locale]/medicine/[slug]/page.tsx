@@ -47,14 +47,31 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   const isCuratedLocale = (CURATED_LOCALES as readonly string[]).includes(locale);
   const indexable = isResearchAnchor && isCuratedLocale;
 
+  const allLocales = ["en", "de", "fr", "es", "it", "pt", "nl", "pl", "sv", "da", "fi", "cs", "ro", "hu", "el", "sk", "sl", "hr", "bg", "et", "lv", "lt", "mt", "ga"];
+
   return {
     title: `${medicine.name}   Indian alternative price, uses and dosage`,
     description: `${medicine.name} (${medicine.genericSalt}) costs ${formatUsd(medicine.usEuPrice, "en")} in the US/EU versus ${formatUsd(medicine.indiaPrice, "en")} in India   about ${savings}% lower. Uses, dosage, side effects and manufacturer details.`,
-    alternates: { canonical: `/${locale}/medicine/${slug}` },
+    alternates: {
+      canonical: `/${locale}/medicine/${slug}`,
+      languages: Object.fromEntries(allLocales.map(l => [l, `/${l}/medicine/${slug}`])),
+    },
     robots: indexable
       ? { index: true, follow: true, googleBot: { index: true, follow: true, "max-snippet": -1 } }
       : { index: false, follow: true },
-    openGraph: { title: `${medicine.name}   Indian alternative`, type: "article" },
+    openGraph: {
+      title: `${medicine.name} — ${savings}% cheaper in India | Jivan`,
+      description: `Compare ${medicine.name} (${medicine.genericSalt}) prices: ${formatUsd(medicine.usEuPrice, "en")} in US vs ${formatUsd(medicine.indiaPrice, "en")} in India. Uses, dosage, side effects.`,
+      type: "article",
+      siteName: "Jivan",
+      images: [{ url: "/og-image.svg", width: 1200, height: 630, alt: `${medicine.name} price comparison` }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${medicine.name} — ${savings}% cheaper in India`,
+      description: `US price: ${formatUsd(medicine.usEuPrice, "en")} → India: ${formatUsd(medicine.indiaPrice, "en")}`,
+      images: ["/og-image.svg"],
+    },
   };
 }
 

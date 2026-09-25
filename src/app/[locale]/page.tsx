@@ -61,6 +61,14 @@ export async function generateMetadata({
       description: copy.heroSubtitle,
       url: `/${locale}`,
       type: "website",
+      siteName: "Jivan",
+      images: [{ url: "/og-image.svg", width: 1200, height: 630, alt: "Jivan — Compare Medicine Prices & Indian Generic Alternatives" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Jivan — Compare Medicine Prices & Indian Generic Alternatives",
+      description: copy.heroSubtitle,
+      images: ["/og-image.svg"],
     },
   };
 }
@@ -135,10 +143,27 @@ export default async function LocalizedHomePage({
     url: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://jivan.health"}/${locale}`,
   };
 
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Jivan — Medicine Access for Everyone",
+    url: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://jivan.health"}/${locale}`,
+    description: copy.heroSubtitle,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://jivan.health"}/${locale}/search?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
 
       {/* ---------------- HERO ---------------- */}
       <section className="hero-aurora relative">
