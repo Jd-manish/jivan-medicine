@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { savingsLabel, savingsPercent } from "@/components/price-block";
+import { ExternalLookupPanel } from "@/components/external-lookup-panel";
 import { useEffect, useMemo, useState } from "react";
 
 type MedicineRow = {
@@ -233,6 +234,28 @@ export function MedicineSearch({
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="skeleton h-56 rounded-3xl" />
             ))}
+          </div>
+        ) : rows.length === 0 && query.trim().length >= 2 ? (
+          <div className="mt-6">
+            <div className="panel rounded-3xl p-6 mb-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-royal-500/10">
+                  <svg viewBox="0 0 24 24" className="h-5 w-5 text-royal-600" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <circle cx="11" cy="11" r="7" />
+                    <path d="m20 20-4.2-4.2" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-ink-900">
+                    &ldquo;{query}&rdquo; is not in our curated catalog
+                  </p>
+                  <p className="text-xs text-ink-500">
+                    Searching global medical databases (RxNorm, openFDA, Wikipedia) for real-time data…
+                  </p>
+                </div>
+              </div>
+            </div>
+            <ExternalLookupPanel query={query.trim()} locale={locale} />
           </div>
         ) : rows.length === 0 ? (
           <div className="panel mt-6 rounded-3xl p-10 text-center">

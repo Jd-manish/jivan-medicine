@@ -64,15 +64,40 @@ export function ExternalLookupPanel({ query, locale }: { query: string; locale: 
       try {
         // Call external APIs directly from the client (all support CORS)
         const term = encodeURIComponent(query);
-        const [fdaRes, wikiRes] = await Promise.allSettled([
-          fetch(`https://api.fda.gov/drug/label.json?search=openfda.generic_name:"${term}"&limit=1`).then(r => r.ok ? r.json() : null),
+        const encoded = encodeURIComponent(`"${query}"`);
+
+        // 1. RxNorm — resolves brand names to generic, finds dosage forms
+        // 2. openFDA — try generic name first, then brand name
+        // 3. Wikipedia — general summary
+        const [rxRes, fdaGenericRes, fdaBrandRes, wikiRes] = await Promise.allSettled([
+          fetch(`https://rxnav.nlm.nih.gov/REST/drugs.json?name=${term}`).then(r => r.ok ? r.json() : null),
+          fetch(`https://api.fda.gov/drug/label.json?search=openfda.generic_name:${encoded}&limit=1`).then(r => r.ok ? r.json() : null),
+          fetch(`https://api.fda.gov/drug/label.json?search=openfda.brand_name:${encoded}&limit=1`).then(r => r.ok ? r.json() : null),
           fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${term}`).then(r => r.ok ? r.json() : null),
         ]);
 
         if (cancelled) return;
 
-        const fda = fdaRes.status === "fulfilled" ? fdaRes.value : null;
+        const rx = rxRes.status === "fulfilled" ? rxRes.value : null;
+        const fda = (fdaGenericRes.status === "fulfilled" && fdaGenericRes.value?.results?.[0])
+          ? fdaGenericRes.value
+          : (fdaBrandRes.status === "fulfilled" ? fdaBrandRes.value : null);
         const wiki = wikiRes.status === "fulfilled" ? wikiRes.value : null;
+
+        // Extract brand names from RxNorm
+        const rxBrandNames: string[] = [];
+        const rxDoseForms: string[] = [];
+        if (rx?.drugGroup?.conceptGroup) {
+          for (const group of rx.drugGroup.conceptGroup) {
+            for (const concept of group.conceptProperties ?? []) {
+              const label = concept.name ?? "";
+              const brand = label.match(/\[([^\]]+)\]/)?.[1];
+              if (brand && !rxBrandNames.includes(brand)) rxBrandNames.push(brand);
+              const form = label.match(/(Oral Tablet|Oral Capsule|Injectable Solution|Injection|Oral Solution|Inhalant|Prefilled Syringe|Topical Cream|Eye Drops|Oral Suspension|Extended Release)/i)?.[1];
+              if (form && !rxDoseForms.includes(form)) rxDoseForms.push(form);
+            }
+          }
+        }
 
         // Try to find matching medicine in our static catalog
         let priceData: LookupResult["price"] = { usEuPrice: null, indiaPrice: null, basis: "No verified Indian market price available yet.", confidence: "unavailable" };
@@ -106,12 +131,22 @@ export function ExternalLookupPanel({ query, locale }: { query: string; locale: 
           }
         } catch {}
 
+        // Merge brand names from all sources
+        const allBrandNames = [...new Set([
+          ...rxBrandNames,
+          ...(fda?.results?.[0]?.openfda?.brand_name ?? []),
+        ])].slice(0, 8);
+
+        const genericName = fda?.results?.[0]?.openfda?.generic_name?.[0]
+          || rx?.drugGroup?.conceptGroup?.[0]?.conceptProperties?.[0]?.name
+          || query;
+
         const result: LookupResult = {
-          found: !!(fda || wiki),
-          title: wiki?.title || fda?.openfda?.generic_name?.[0] || query,
-          genericSalt: fda?.openfda?.generic_name?.[0] || query,
-          brandNames: fda?.openfda?.brand_name?.slice(0, 6) ?? [],
-          doseForms: [],
+          found: !!(rx?.drugGroup?.conceptGroup?.length || fda || wiki),
+          title: wiki?.title || genericName || query,
+          genericSalt: genericName,
+          brandNames: allBrandNames,
+          doseForms: rxDoseForms,
           summary: wiki?.extract || "",
           uses: (fda?.results?.[0]?.indications_and_usage ?? []).join(" ").split(/(?<=\.)\s+/).slice(0, 4),
           dosage: (fda?.results?.[0]?.dosage_and_administration ?? []).join(" ").split(/(?<=\.)\s+/).slice(0, 4),
@@ -122,6 +157,7 @@ export function ExternalLookupPanel({ query, locale }: { query: string; locale: 
           price: priceData,
           indianAlternatives: alternatives,
           sources: [
+            ...(rx?.drugGroup?.conceptGroup?.length ? [{ label: "RxNorm · US National Library of Medicine", url: `https://rxnav.nlm.nih.gov/REST/drugs.json?name=${encodeURIComponent(query)}` }] : []),
             ...(fda ? [{ label: "openFDA drug label", url: "https://open.fda.gov/apis/drug/label/" }] : []),
             ...(wiki ? [{ label: "Wikipedia", url: wiki.content_urls?.desktop?.page || "" }] : []),
           ],
