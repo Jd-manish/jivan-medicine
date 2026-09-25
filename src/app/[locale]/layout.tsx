@@ -53,6 +53,7 @@ export default async function LocaleLayout({
   const navItems = [
     { href: `/${locale}`, label: copy.navHome },
     { href: `/${locale}/search`, label: copy.navMedicines },
+    { href: `/${locale}/surgeries`, label: "Surgeries" },
     { href: `/${locale}#savings`, label: "Savings estimator" },
     { href: `/${locale}/articles`, label: copy.navArticles },
     { href: `/${locale}/mission`, label: "Mission" },

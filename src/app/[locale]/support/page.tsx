@@ -4,7 +4,7 @@ import { GlobeArt, MoleculeArt, ShieldArt, WalletArt } from "@/components/medica
 import { isValidLocale } from "@/lib/i18n";
 import { P } from "@/lib/ui-panels";
 import { ui } from "@/lib/ui-core";
-import { defaultSettings } from "@/lib/settings";
+import { paymentConfig, getPaymentMethods } from "@/lib/payment-config";
 
 export const metadata: Metadata = {
   title: "Support Jivan — help keep medicine pricing free",
@@ -15,18 +15,9 @@ export const metadata: Metadata = {
 export default async function SupportPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
 
-  const s = defaultSettings;
+  const s = paymentConfig;
 
-  const payments: { label: string; value: string }[] = [
-    { label: "UPI ID", value: s.support_upi },
-    { label: "PayPal", value: s.support_paypal },
-    { label: "Bank name", value: s.support_bank_name },
-    { label: "Account holder", value: s.support_account_name },
-    { label: "Account number", value: s.support_account_number },
-    { label: "IFSC code", value: s.support_ifsc },
-    { label: "SWIFT / BIC", value: s.support_swift },
-    { label: "Crypto wallet", value: s.support_crypto },
-  ].filter((item) => item.value.trim().length > 0);
+  const payments = getPaymentMethods();
 
   const costs = [
     { icon: <GlobeArt className="h-9 w-9" />, t: P.supCosts1T, d: P.supCosts1D },
@@ -43,9 +34,9 @@ export default async function SupportPage({ params }: { params: Promise<{ locale
         <div className="shell relative py-14 sm:py-20">
           <span className="chip">Support the project</span>
           <h1 className="anim-rise mt-5 max-w-3xl text-3xl font-black leading-tight text-white sm:text-5xl">
-            {s.support_headline}
+            {s.headline}
           </h1>
-          <p className="anim-rise delay-2 mt-5 max-w-2xl text-base leading-7 text-ink-200">{s.support_message}</p>
+          <p className="anim-rise delay-2 mt-5 max-w-2xl text-base leading-7 text-ink-200">{s.message}</p>
         </div>
       </section>
 
@@ -64,7 +55,7 @@ export default async function SupportPage({ params }: { params: Promise<{ locale
           <div className="panel rounded-3xl p-6 sm:p-8">
             <h2 className="text-2xl font-bold text-ink-900">{ui(locale as any, P.supDetailsTitle)}</h2>
 
-            {payments.length === 0 && !s.support_qr_url ? (
+            {payments.length === 0 && !s.qrCodeUrl ? (
               <div className="mt-4 rounded-2xl bg-amber-50 p-5">
                 <p className="text-sm leading-6 text-amber-800">
                   Payment details are not configured yet. Contact the admin for contribution details.
@@ -87,18 +78,18 @@ export default async function SupportPage({ params }: { params: Promise<{ locale
               </div>
             )}
 
-            {s.support_note ? (
-              <p className="mt-6 rounded-2xl border border-ink-100 p-4 text-xs leading-6 text-ink-400">{s.support_note}</p>
+            {s.note ? (
+              <p className="mt-6 rounded-2xl border border-ink-100 p-4 text-xs leading-6 text-ink-400">{s.note}</p>
             ) : null}
           </div>
 
           <aside className="space-y-5">
-            {s.support_qr_url ? (
+            {s.qrCodeUrl ? (
               <div className="panel rounded-3xl p-6 text-center">
                 <h3 className="text-sm font-bold uppercase tracking-wide text-ink-400">QR Code</h3>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={s.support_qr_url}
+                  src={s.qrCodeUrl}
                   alt="Payment QR code"
                   className="mx-auto mt-4 h-48 w-48 rounded-2xl border border-ink-100 object-contain"
                 />
