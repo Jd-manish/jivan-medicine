@@ -7,7 +7,7 @@
     "start": "npx serve out",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "deploy": "npm run build && npx wrangler pages deploy out --project-name jivan-medicine"
+    "deploy": "npm run build && npx wrangler pages deploy out --project-name jivan-medicine --branch main"
   },
   "dependencies": {
     "next": "16.2.6",

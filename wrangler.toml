@@ -1,13 +1,14 @@
 # Cloudflare Pages configuration for Jivan Medicine
-# Deploy: npm run pages:build && npm run pages:deploy
+# Static site — no Workers runtime needed.
 #
-# Environment variables should be set in the Cloudflare dashboard:
-# Pages > Settings > Environment Variables
-# Required: DATABASE_URL, ADMIN_PANEL_PASSWORD, ADMIN_SESSION_SECRET
+# Build settings in Cloudflare Dashboard:
+#   Build command: npm run build
+#   Build output directory: out
+#   Root directory: /
+#   Branch: main
+#
+# After first deploy, add custom domain:
+#   Pages > Settings > Custom domains > Add > jivan.health
 
 name = "jivan-medicine"
 compatibility_date = "2024-09-23"
-compatibility_flags = ["nodejs_compat"]
-
-[vars]
-# Set these in Cloudflare dashboard, NOT here (secrets)
