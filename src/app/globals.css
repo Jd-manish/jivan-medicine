@@ -568,3 +568,159 @@ body {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* ============================================================
+   DARK MODE
+   ============================================================ */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-ink-50: #1a1f2e;
+  --color-ink-100: #232839;
+  --color-ink-200: #3a4158;
+  --color-ink-400: #8892ab;
+  --color-ink-600: #c5cde0;
+  --color-ink-800: #e8edf6;
+  --color-ink-900: #f5f7fb;
+}
+
+:root[data-theme="dark"] body {
+  background:
+    radial-gradient(1100px 620px at 12% -8%, rgba(14, 80, 60, 0.15) 0%, transparent 58%),
+    radial-gradient(900px 520px at 92% 2%, rgba(30, 50, 90, 0.15) 0%, transparent 55%),
+    linear-gradient(180deg, #0f1318 0%, #0d1117 100%);
+}
+
+:root[data-theme="dark"] .panel {
+  background: #161b27;
+  border-color: #232839;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 22px 50px -34px rgba(0,0,0,0.6);
+}
+
+:root[data-theme="dark"] .panel-hover:hover {
+  border-color: rgba(18,185,140,0.3);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 30px 60px -30px rgba(13,147,112,0.2);
+}
+
+:root[data-theme="dark"] .glass-card {
+  background: rgba(22,27,39,0.85);
+  border-color: rgba(255,255,255,0.08);
+}
+
+:root[data-theme="dark"] header {
+  background: rgba(15,19,24,0.85);
+  border-color: rgba(255,255,255,0.06);
+}
+
+:root[data-theme="dark"] footer {
+  background: #0f1318;
+  border-color: #232839;
+}
+
+:root[data-theme="dark"] .chip {
+  border-color: rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+}
+
+:root[data-theme="dark"] .pill-tab {
+  background: #232839;
+  color: #c5cde0;
+}
+
+:root[data-theme="dark"] .skeleton {
+  background: #232839;
+}
+
+:root[data-theme="dark"] .skeleton::after {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+}
+
+:root[data-theme="dark"] input[type="search"],
+:root[data-theme="dark"] input[type="text"],
+:root[data-theme="dark"] textarea,
+:root[data-theme="dark"] select {
+  background: #1a1f2e;
+  border-color: #3a4158;
+  color: #e8edf6;
+}
+
+:root[data-theme="dark"] input:focus {
+  border-color: var(--color-mint-500);
+}
+
+:root[data-theme="dark"] .btn-primary {
+  box-shadow: 0 16px 36px -16px rgba(18,185,140,0.4);
+}
+
+/* Auto dark via system preference */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --color-ink-50: #1a1f2e;
+    --color-ink-100: #232839;
+    --color-ink-200: #3a4158;
+    --color-ink-400: #8892ab;
+    --color-ink-600: #c5cde0;
+    --color-ink-800: #e8edf6;
+    --color-ink-900: #f5f7fb;
+  }
+  :root:not([data-theme="light"]) body {
+    background:
+      radial-gradient(1100px 620px at 12% -8%, rgba(14,80,60,0.15) 0%, transparent 58%),
+      radial-gradient(900px 520px at 92% 2%, rgba(30,50,90,0.15) 0%, transparent 55%),
+      linear-gradient(180deg, #0f1318 0%, #0d1117 100%);
+  }
+  :root:not([data-theme="light"]) .panel {
+    background: #161b27;
+    border-color: #232839;
+  }
+  :root:not([data-theme="light"]) header {
+    background: rgba(15,19,24,0.85);
+    border-color: rgba(255,255,255,0.06);
+  }
+  :root:not([data-theme="light"]) footer {
+    background: #0f1318;
+    border-color: #232839;
+  }
+}
+
+/* ============================================================
+   PRINT STYLES — doctor-friendly output
+   ============================================================ */
+@media print {
+  body { background: white !important; color: black !important; font-size: 11pt; }
+  header, footer, [class*="support"], [class*="mobile-nav"], .back-to-top,
+  .btn-primary, .btn-ghost, nav, .marquee-track, .grid-lines,
+  .hero-aurora::after, [class*="anim-"], .chip, .pill-tab { display: none !important; }
+  .panel { box-shadow: none !important; border: 1px solid #ddd !important; break-inside: avoid; }
+  .hero-aurora { background: white !important; color: black !important; }
+  .hero-aurora h1, .hero-aurora p, .hero-aurora span { color: black !important; }
+  a { color: #0d9370 !important; text-decoration: underline !important; }
+  .text-gradient { background: none !important; color: black !important; -webkit-text-fill-color: black !important; }
+  body::before {
+    content: "Jivan — Medicine Price Comparison";
+    display: block; font-size: 14pt; font-weight: bold;
+    margin-bottom: 1rem; padding-bottom: 0.5rem;
+    border-bottom: 2px solid #0d9370;
+  }
+}
+
+/* ============================================================
+   ACCESSIBILITY
+   ============================================================ */
+@media (prefers-contrast: high) {
+  .panel { border-width: 2px; }
+  .btn-primary { border: 2px solid var(--color-ink-900); }
+}
+
+.skip-to-content {
+  position: absolute; left: -9999px; width: 1px; height: 1px;
+  overflow: hidden; z-index: 9999;
+}
+
+.skip-to-content:focus {
+  position: fixed; top: 12px; left: 12px;
+  width: auto; height: auto; padding: 12px 20px;
+  background: var(--color-ink-900); color: white;
+  font-weight: 600; border-radius: 8px;
+  outline: 2px solid var(--color-mint-400);
+}

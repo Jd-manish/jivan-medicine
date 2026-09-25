@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
+import { DarkModeToggle } from "@/components/dark-mode-toggle";
 import { TopSearch } from "@/components/top-search";
 
 type NavItem = { href: string; label: string };
@@ -39,6 +40,8 @@ export function SiteHeader({
         </div>
 
         <div className="flex items-center gap-2">
+          <DarkModeToggle />
+
           <select
             aria-label="Language"
             defaultValue={locale}
