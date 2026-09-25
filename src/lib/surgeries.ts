@@ -28,6 +28,8 @@ export type Surgery = {
     australia: { low: number; high: number };
     india: { low: number; high: number };
   };
+  /** Price sources — where the numbers come from */
+  sources?: string[];
   /** Why India is cheaper — specific factors */
   whyCheaper: string[];
   /** Quality notes — accreditation, success rates */
@@ -58,11 +60,16 @@ export const surgeries: Surgery[] = [
     hospitalStay: "Same-day discharge (outpatient)",
     recovery: "1–2 weeks for full vision stabilisation",
     prices: {
-      us: { low: 3500, high: 7000 },
+      us: { low: 3500, high: 10000 },
       eu: { low: 2500, high: 5500 },
       australia: { low: 3000, high: 6000 },
-      india: { low: 200, high: 800 },
+      india: { low: 180, high: 1500 },
     },
+    sources: [
+      "hexahealth.com/treatment/cataract-surgery-cost — India: ₹20,000–₹1,30,000 (2026)",
+      "curemeabroad.com — US: $3,500–$10,000, India: $600–$2,000 (2026)",
+      "pristyncare.com — India phaco: ₹32,500–₹39,000 per eye",
+    ],
     whyCheaper: [
       "High surgical volume — Indian eye hospitals perform thousands per month",
       "Lower surgeon and staff fees without compromising training standards",
@@ -141,11 +148,17 @@ export const surgeries: Surgery[] = [
     hospitalStay: "3–5 days",
     recovery: "6–12 weeks for daily activities, 3–6 months for full recovery",
     prices: {
-      us: { low: 30000, high: 50000 },
+      us: { low: 30000, high: 70000 },
       eu: { low: 15000, high: 30000 },
       australia: { low: 20000, high: 35000 },
-      india: { low: 3500, high: 8000 },
+      india: { low: 3600, high: 9000 },
     },
+    sources: [
+      "jforh.com — India: $5,500–$8,500, US: $35,000–$65,000 (2026)",
+      "qualitycareglobal.com — India: $3,600–$9,000, US: $30,000–$70,000",
+      "bookimed.com — India: $3,600–$6,600, US avg: $45,000",
+      "hospital.alampoint.com — India: $3,000–$6,000, US: $35,000–$60,000+",
+    ],
     whyCheaper: [
       "Same implant brands (Zimmer Biomet, Stryker, DePuy Synthes) at lower markup",
       "Lower surgeon fees — not lower skill, but lower cost of living",
@@ -308,11 +321,16 @@ export const surgeries: Surgery[] = [
     hospitalStay: "5–10 days (open), 2–4 days (TAVR)",
     recovery: "6–12 weeks (open), 2–4 weeks (TAVR)",
     prices: {
-      us: { low: 80000, high: 200000 },
-      eu: { low: 40000, high: 100000 },
-      australia: { low: 50000, high: 120000 },
-      india: { low: 5500, high: 18000 },
+      us: { low: 50000, high: 200000 },
+      eu: { low: 25000, high: 80000 },
+      australia: { low: 40000, high: 100000 },
+      india: { low: 3500, high: 18000 },
     },
+    sources: [
+      "afiyaindia.com — India: $4,800–$12,000, US: $80,000+ (2025)",
+      "shifamhealth.com — India: $3,500–$9,000, US: ≥$80,000 (2026)",
+      "wmedtour.com — India: $8,000–$15,000, US: $50,000–$100,000+",
+    ],
     whyCheaper: [
       "India manufactures its own heart valves (TTK Healthcare, Meril Life Sciences)",
       "Same international brands (Edwards, Medtronic) available at India-negotiated prices",
@@ -350,11 +368,16 @@ export const surgeries: Surgery[] = [
     hospitalStay: "5–10 days",
     recovery: "6–12 weeks, 3–6 months for full recovery",
     prices: {
-      us: { low: 70000, high: 200000 },
-      eu: { low: 30000, high: 80000 },
+      us: { low: 57000, high: 150000 },
+      eu: { low: 25000, high: 80000 },
       australia: { low: 40000, high: 100000 },
-      india: { low: 4500, high: 12000 },
+      india: { low: 4000, high: 12000 },
     },
+    sources: [
+      "treatmentpossible.com — India: $4,000–$6,000, US: $57,000–$150,000 (2026)",
+      "afiyaindia.com — India: $4,000–$12,000, US: $75,000–$150,000+",
+      "curemeabroad.com — India: $5,000–$10,000, US: $57,000–$150,000",
+    ],
     whyCheaper: [
       "Same surgical technique and equipment (on-pump and off-pump CABG)",
       "Lower surgeon and team fees — not lower training standards",
@@ -395,8 +418,12 @@ export const surgeries: Surgery[] = [
       us: { low: 25000, high: 50000 },
       eu: { low: 10000, high: 25000 },
       australia: { low: 15000, high: 35000 },
-      india: { low: 1500, high: 5000 },
+      india: { low: 2400, high: 6400 },
     },
+    sources: [
+      "afiyaindia.com — India: $2,400–$6,400, US: $30,000–$50,000+ (2025)",
+      "treatmentpossible.com — India: $2,500–$4,000, US: $25,000–$50,000",
+    ],
     whyCheaper: [
       "India capped coronary stent prices in 2017 — drug-eluting stents capped at ₹30,000 (~$360)",
       "Same international brands (Abbott, Boston Scientific, Medtronic) at regulated prices",

@@ -161,6 +161,19 @@ export default async function SurgeryDetailPage({
               </ul>
             </div>
 
+            {/* Price sources */}
+            {surgery.sources && surgery.sources.length > 0 && (
+              <div className="panel rounded-3xl p-6">
+                <h3 className="text-sm font-bold uppercase tracking-wide text-ink-400">Price sources</h3>
+                <ul className="mt-3 space-y-1.5">
+                  {surgery.sources.map((src, i) => (
+                    <li key={i} className="text-[11px] leading-4 text-ink-400">📊 {src}</li>
+                  ))}
+                </ul>
+                <p className="mt-3 text-[10px] text-ink-300">Prices are indicative ranges for uninsured international patients (2025–2026). Actual quotes depend on case complexity, hospital tier, and length of stay.</p>
+              </div>
+            )}
+
             {/* Share */}
             <div className="panel rounded-3xl p-6">
               <h3 className="text-sm font-bold uppercase tracking-wide text-ink-400">Share this comparison</h3>
