@@ -12,7 +12,7 @@ This repository is designed for a fully static Cloudflare Pages deployment. GitH
    - **Build command:** `npm run build`
    - **Build output directory:** `out`
    - **Root directory:** `/`
-   - **Environment:** Node.js 22
+   - **Environment:** Node.js 22 (the repository's `.nvmrc` selects 22; if the dashboard overrides it, set `NODE_VERSION=22`)
 4. Add `NEXT_PUBLIC_SITE_URL=https://jivanrx.online` as a build-time variable. Add `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` only if Google Search Console verification is being used.
 5. Save and run the first deployment. In **Custom domains**, attach `jivanrx.online` and any desired `www` hostname, then configure the DNS records Cloudflare provides.
 
