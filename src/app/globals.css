@@ -4,17 +4,33 @@
   --color-ink-50: #f5f7fb;
   --color-ink-100: #e8edf6;
   --color-ink-200: #cbd6e8;
+  --color-ink-300: #a7b6ce;
   --color-ink-400: #7d8dab;
+  --color-ink-500: #586b8b;
   --color-ink-600: #3b4a66;
+  --color-ink-700: #24334f;
   --color-ink-800: #16213a;
   --color-ink-900: #0b1020;
+  --color-mint-50: #effcf8;
+  --color-mint-100: #d9f7ed;
+  --color-mint-200: #b1eedb;
   --color-mint-300: #6ee7c7;
   --color-mint-400: #34d3aa;
   --color-mint-500: #12b98c;
   --color-mint-600: #0d9370;
+  --color-mint-700: #08785e;
+  --color-mint-800: #075f4b;
+  --color-mint-900: #064b3d;
+  --color-royal-50: #f0f5ff;
+  --color-royal-100: #dce8ff;
+  --color-royal-200: #bfd4ff;
+  --color-royal-300: #92b7ff;
   --color-royal-400: #6aa8ff;
   --color-royal-500: #3d7dfb;
   --color-royal-600: #2b5fd9;
+  --color-royal-700: #214fbd;
+  --color-royal-800: #1d429a;
+  --color-royal-900: #173675;
 }
 
 :root {
@@ -581,6 +597,26 @@ body {
   --color-ink-600: #c5cde0;
   --color-ink-800: #e8edf6;
   --color-ink-900: #f5f7fb;
+  --color-mint-50: #122b25;
+  --color-mint-100: #17382f;
+  --color-mint-200: #205748;
+  --color-mint-300: #9cf2d8;
+  --color-mint-400: #69e5c1;
+  --color-mint-500: #31d0a6;
+  --color-mint-600: #55e2bd;
+  --color-mint-700: #8af1d3;
+  --color-mint-800: #b8f7e5;
+  --color-mint-900: #dafcf1;
+  --color-royal-50: #151f35;
+  --color-royal-100: #1a2a47;
+  --color-royal-200: #233c63;
+  --color-royal-300: #5c91e5;
+  --color-royal-400: #8ab7ff;
+  --color-royal-500: #6aa8ff;
+  --color-royal-600: #90baff;
+  --color-royal-700: #b0ceff;
+  --color-royal-800: #cee0ff;
+  --color-royal-900: #e5efff;
 }
 
 :root[data-theme="dark"] body {
@@ -651,6 +687,38 @@ body {
   box-shadow: 0 16px 36px -16px rgba(18,185,140,0.4);
 }
 
+:root[data-theme="dark"] #catalog .bg-white,
+:root[data-theme="dark"] .top-search-menu {
+  background-color: #1a1f2e;
+  border-color: #30384d;
+}
+
+:root[data-theme="dark"] #catalog .bg-sky-50,
+:root[data-theme="dark"] .top-search-menu .bg-sky-50 {
+  background-color: #10283b;
+}
+
+:root[data-theme="dark"] #catalog .text-sky-900,
+:root[data-theme="dark"] .top-search-menu .text-sky-900 {
+  color: #d7ebff;
+}
+
+:root[data-theme="dark"] #catalog .bg-amber-50 {
+  background-color: #332711;
+}
+
+:root[data-theme="dark"] #catalog .text-amber-800 {
+  color: #ffe2a6;
+}
+
+:root[data-theme="dark"] #catalog .bg-rose-50 {
+  background-color: #351b29;
+}
+
+:root[data-theme="dark"] #catalog .text-rose-900 {
+  color: #ffd8e8;
+}
+
 /* Auto dark via system preference */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -662,6 +730,26 @@ body {
     --color-ink-600: #c5cde0;
     --color-ink-800: #e8edf6;
     --color-ink-900: #f5f7fb;
+    --color-mint-50: #122b25;
+    --color-mint-100: #17382f;
+    --color-mint-200: #205748;
+    --color-mint-300: #9cf2d8;
+    --color-mint-400: #69e5c1;
+    --color-mint-500: #31d0a6;
+    --color-mint-600: #55e2bd;
+    --color-mint-700: #8af1d3;
+    --color-mint-800: #b8f7e5;
+    --color-mint-900: #dafcf1;
+    --color-royal-50: #151f35;
+    --color-royal-100: #1a2a47;
+    --color-royal-200: #233c63;
+    --color-royal-300: #5c91e5;
+    --color-royal-400: #8ab7ff;
+    --color-royal-500: #6aa8ff;
+    --color-royal-600: #90baff;
+    --color-royal-700: #b0ceff;
+    --color-royal-800: #cee0ff;
+    --color-royal-900: #e5efff;
   }
   :root:not([data-theme="light"]) body {
     background:
@@ -680,6 +768,31 @@ body {
   :root:not([data-theme="light"]) footer {
     background: #0f1318;
     border-color: #232839;
+  }
+  :root:not([data-theme="light"]) #catalog .bg-white,
+  :root:not([data-theme="light"]) .top-search-menu {
+    background-color: #1a1f2e;
+    border-color: #30384d;
+  }
+  :root:not([data-theme="light"]) #catalog .bg-sky-50,
+  :root:not([data-theme="light"]) .top-search-menu .bg-sky-50 {
+    background-color: #10283b;
+  }
+  :root:not([data-theme="light"]) #catalog .text-sky-900,
+  :root:not([data-theme="light"]) .top-search-menu .text-sky-900 {
+    color: #d7ebff;
+  }
+  :root:not([data-theme="light"]) #catalog .bg-amber-50 {
+    background-color: #332711;
+  }
+  :root:not([data-theme="light"]) #catalog .text-amber-800 {
+    color: #ffe2a6;
+  }
+  :root:not([data-theme="light"]) #catalog .bg-rose-50 {
+    background-color: #351b29;
+  }
+  :root:not([data-theme="light"]) #catalog .text-rose-900 {
+    color: #ffd8e8;
   }
 }
 

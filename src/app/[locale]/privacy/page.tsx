@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { isValidLocale, supportedLocales } from "@/lib/i18n";
-
+import { isValidLocale } from "@/lib/i18n";
+import { localizedAlternates, localizedRobots } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -12,89 +12,78 @@ export async function generateMetadata({
 
   return {
     title: "Privacy Policy",
-    description:
-      "How Jivan handles data: what we collect, what we never collect, third-party advertising cookies including Google AdSense disclosure, analytics, retention, and your rights.",
-    alternates: {
-      canonical: `/${locale}/privacy`,
-      languages: Object.fromEntries(supportedLocales.map((alt) => [alt, `/${alt}/privacy`])),
-    },
+    description: "How Jivan handles technical data, public-source search lookups, browser storage, and email correspondence.",
+    alternates: localizedAlternates(locale, "privacy"),
+    robots: localizedRobots(locale),
   };
 }
 
 const sections = [
   {
-    h: "1. What we collect — and what we deliberately do not",
+    h: "1. What the site handles",
     body: [
-      "We are a privacy-minimal service by design. You can read every article, search the catalog and compare prices without an account, a login, or any identifying information.",
-      "Technical data: your browser automatically sends an IP address, browser type, device class and language preference with every request. We use the language preference to route you to a localized version of the site.",
-      "Voluntary submissions: if you send a question, leave feedback, or request a price-check, we store exactly the fields you typed (name, email if given, country, and your message). We never enrich, buy, or infer additional data about you.",
-      "What we never collect: medical records, images of prescriptions, genetic data, biometric data, or payment card details. Please do not send medical records or prescription scans through any form on this site.",
+      "You can read articles, search the static catalog, and compare prices without an account or login. Jivan does not operate an application database or an on-site contact-submission form.",
+      "Technical requests: Cloudflare Pages and other delivery infrastructure may process your IP address, browser/request metadata, and requested URL to serve the site and protect it from abuse. See Cloudflare's privacy terms for its processing and retention practices.",
+      "Unmatched searches: when the medicine catalog and procedure index have no match, the search page automatically sends the query directly from your browser to RxNorm (U.S. National Library of Medicine), openFDA (U.S. Food and Drug Administration), and Wikipedia for public-source background. Those services may receive the query, IP address, and standard request metadata under their own privacy terms. Search terms can also remain in your browser history and hosting request logs. Do not enter a person's name or other identifying health information. Jivan does not persist the lookup responses in an application database.",
+      "Browser storage: the theme preference and comparison selections use local storage; dismissing the support button uses session storage. These preferences stay in your browser and are not used to identify you.",
+      "Please do not send medical records, prescription images, genetic data, biometric data, or payment-card details to Jivan or to a public lookup service.",
     ],
   },
   {
-    h: "2. How submissions are handled",
+    h: "2. Email correspondence",
     body: [
-      "Questions are private: they are visible only to the administrator, are never published, and are deleted once answered or on request.",
-      "Feedback is different: it is submitted specifically for publication after moderation. Your display name and country (if provided) appear publicly; your email never does.",
-      "Price-check leads are used only to respond to your request. We do not add them to marketing lists and there is no newsletter to opt out of.",
+      "Contact and correction links use mailto links. If you choose to send an email, your email provider transmits it to the address you selected; the message is handled in that recipient mailbox and is not submitted to or stored by the static website. The mailbox provider and recipient may retain correspondence under their own policies.",
+      "Messages are not published on the site. Do not include sensitive health details. To request deletion of correspondence, write to the same address and identify the message as clearly as possible.",
     ],
   },
   {
-    h: "3. Advertising and third-party cookies (including Google)",
+    h: "3. Advertising and cookies",
     body: [
-      "Where advertising is enabled, it is served by third-party vendors including Google AdSense. Third-party vendors, including Google, use cookies to serve ads based on your prior visits to this website and other websites.",
-      "Google's use of advertising cookies enables it and its partners to serve ads to you based on your visit to this site and/or other sites on the internet. You can opt out of personalized advertising by visiting Google Ads Settings (adssettings.google.com) and www.aboutads.info/choices.",
-      "If ads are not yet enabled on this site, no advertising cookies are being set. We will update this policy before enabling them; approval changes are never applied silently to this document.",
-      "Analytics, where used, is configured for aggregate reporting (page views, approximate geography) and is not used to build individual profiles.",
+      "The current site build has advertising disabled. If advertising is enabled in a future build, third-party vendors such as Google AdSense may use cookies or similar technologies; this policy and any required consent controls must be updated before that change.",
+      "Jivan does not currently include an application account, newsletter, or advertising profile. Cloudflare's delivery services may process technical request data as described above.",
     ],
     notes: [
-      "Cookie categories: strictly-necessary (locale session, admin session), preference (dismissed hints), and third-party advertising cookies (only when ads are enabled).",
-      "EU/UK visitors: where personalized ads are used, a consent mechanism is required and non-consented users receive non-personalized or no ads.",
+      "The site uses browser local/session storage for preferences; this is distinct from a cookie and can be cleared in your browser settings.",
+      "EU/UK visitors: if personalized advertising is introduced, the required consent choices must be presented before it is used.",
     ],
   },
   {
-    h: "4. Data retention",
+    h: "4. Retention and deletion",
     body: [
-      "Questions: deleted after handling, or within 12 months at most.",
-      "Feedback: retained while it remains published; deleted permanently if you unpublish it via our contact page.",
-      "Price-check leads: retained up to 12 months so we can see whether follow-up was completed."
+      "Jivan does not keep search responses or voluntary submissions in an application database. Browser preferences remain until you clear them; session storage is normally cleared when the browser session ends.",
+      "Email correspondence is retained in the recipient mailbox for handling and record-keeping. Contact the recipient address to request deletion; hosting and public-source providers apply their own log and retention policies.",
     ],
   },
   {
     h: "5. Sharing and selling",
     body: [
-      "We do not sell personal information. We do not share submission content with marketers, brokers, or third parties for their own use.",
-      "Vendor processing: hosting, database and error-monitoring providers may process technical data on our behalf under their own terms; this is infrastructure, not data sharing for commercial purposes.",
-      "Legal: we disclose data only if compelled by a valid legal order, and where lawful we will attempt to notify affected users.",
+      "Jivan does not sell personal information. Unmatched search terms are sent to the named public-source services from your browser, and technical requests are handled by Cloudflare Pages and related delivery infrastructure. Those providers process data under their own terms.",
+      "We do not provide search terms or email correspondence to marketers or brokers for their own marketing use. We may disclose information when required by a valid legal order and, where lawful, will attempt to notify affected people.",
     ],
   },
   {
-    h: "6. Your rights (including GDPR/UK GDPR and CCPA-style rights)",
+    h: "6. Privacy requests",
     body: [
-      "You may request access to, a copy of, correction of, or deletion of any personal data we hold about you. Because we hold so little, requests are fast and free.",
-      "Write to support@jivan.health with the subject “Data request,” tell us what you need, and we verify by the email you submit.",
-      "EU/UK residents may also complain to their national data protection authority; US residents of covered states may exercise opt-out and deletion rights over the (minimal) data we hold.",
+      "You may ask what personal information Jivan holds about you or request its correction or deletion. Because the site has no application account or submission database, most site preferences can be cleared directly in your browser; email correspondence can be addressed to its recipient mailbox.",
+      "For a privacy question, write to support@jivan.health with the subject “Data request.” EU/UK residents may also contact their national data protection authority; rights available to other residents depend on applicable law.",
     ],
   },
   {
     h: "7. Children",
     body: [
-      "Jivan is a general-audience information service with no account system and is not directed at children under 13. We do not knowingly collect data from children. If a submission is identified as coming from a child, it is deleted.",
+      "Jivan is a general-audience information service and is not directed at children under 13. Do not include a child's name or identifying health information in a search or email. If you believe a child has sent sensitive information to a Jivan mailbox, contact that mailbox to request deletion.",
     ],
   },
   {
     h: "8. Changes to this policy",
     body: [
-      "This policy lives at a permanent URL with a visible “last updated” line. Material changes are described on this page; we do not make material changes silently.",
-      "Last updated: February 2026."
+      "Material changes are described on this page. The policy is reviewed when the site's data flows or third-party services change.",
+      "Last updated: 7 October 2026.",
     ],
   },
 ];
 
-export default async function PrivacyPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
-  
-
+export default function PrivacyPage() {
   return (
     <>
       <section className="border-b border-ink-100 bg-white">
@@ -102,8 +91,7 @@ export default async function PrivacyPage({ params }: { params: Promise<{ locale
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-mint-600">Legal</p>
           <h1 className="mt-3 text-3xl font-black text-ink-900 sm:text-4xl">Privacy Policy</h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-ink-600">
-            Jivan is privacy-minimal by design. This policy covers what we collect, what we never collect,
-            advertising cookies, retention, and your rights.
+            Jivan is a static, account-free information site. This policy explains public-source search lookups, browser storage, technical request data, and email correspondence.
           </p>
         </div>
       </section>
@@ -114,8 +102,8 @@ export default async function PrivacyPage({ params }: { params: Promise<{ locale
             <section key={section.h} className="panel rounded-3xl p-6 sm:p-8">
               <h2 className="text-lg font-bold text-ink-900">{section.h}</h2>
               <div className="mt-3 space-y-3">
-                {section.body.map((p) => (
-                  <p key={p} className="text-sm leading-7 text-ink-600">{p}</p>
+                {section.body.map((paragraph) => (
+                  <p key={paragraph} className="text-sm leading-7 text-ink-600">{paragraph}</p>
                 ))}
               </div>
               {section.notes ? (

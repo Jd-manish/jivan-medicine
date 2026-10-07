@@ -1,39 +1,14 @@
 import type { Article } from "@/lib/article-types";
 import { caseArticles } from "@/lib/articles-cases";
 import { guideArticles } from "@/lib/articles-guides";
+import { surgeryArticles } from "@/lib/articles-surgery";
 
 export type { Article, ArticleSection, Callout, Faq, Reference } from "@/lib/article-types";
 export { CASE_DISCLAIMER } from "@/lib/article-types";
 
-/**
- * Editorial cadence schedule.
- *
- * Google's scaled-content policy specifically flags sites that publish a
- * large article batch with a single timestamp burst. Stagger each article
- * across a realistic weekly cadence instead of one identical date:
- * published at week N, reviewed/refreshed at week N+3. Deterministic —
- * assigned by library position, stable across rebuilds.
- */
-const FIRST_PUBLISH = Date.UTC(2025, 10, 3); // 3 Nov 2025
-
-function staggerDates(index: number): { published: string; updated: string } {
-  const publish = new Date(FIRST_PUBLISH + index * 7 * 24 * 60 * 60 * 1000);
-  const refresh = new Date(publish.getTime() + 21 * 24 * 60 * 60 * 1000);
-  return { published: publish.toISOString(), updated: refresh.toISOString() };
-}
-
-const rawArticles: Article[] = [...guideArticles, ...caseArticles];
-
-export const articles: Article[] = rawArticles.map((article, index) => {
-  const dates = staggerDates(index);
-  return {
-    ...article,
-    // updatedAt drives display + schema modified date; publish schedule is
-    // overlaid on top and preserved in a parallel-field.
-    updatedAt: dates.updated,
-    publishedAt: dates.published,
-  };
-});
+// Preserve only source-recorded dates. Never synthesize staggered publish or
+// review timestamps to make a batch appear older or independently reviewed.
+export const articles: Article[] = [...guideArticles, ...caseArticles, ...surgeryArticles];
 
 export const articleCategories = ["All", "Guide", "Case Study", "Safety", "Explainer"] as const;
 export type ArticleCategory = (typeof articleCategories)[number];

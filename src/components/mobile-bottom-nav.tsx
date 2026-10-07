@@ -20,7 +20,7 @@ export function MobileBottomNav({ locale }: { locale: string }) {
     { href: `/${locale}`, label: "Home", d: icons.home },
     { href: `/${locale}#catalog`, label: "Search", d: icons.search },
     { href: `/${locale}/articles`, label: "Guides", d: icons.book },
-    { href: `/${locale}#quote`, label: "Quote", d: icons.chat },
+    { href: `/${locale}/contact/`, label: "Quote", d: icons.chat },
   ];
 
   return (

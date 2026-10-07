@@ -2,22 +2,11 @@
 
 import { P } from "@/lib/ui-panels";
 import { ui } from "@/lib/ui-core";
-import { useEffect, useState } from "react";
-
-function detectLocale(): string {
-  if (typeof navigator === "undefined") return "en";
-  const base = navigator.language.toLowerCase().split("-")[0];
-  return base.split("-")[0] as string;
-}
-
 export default function GlobalError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
-  const [locale, setLocale] = useState("en");
-
-  useEffect(() => {
-    setLocale(detectLocale());
-  }, []);
-
-  const home = `/${locale}`;
+  // Keep the global fallback deterministic for static export and hydration.
+  // It never redirects or varies by browser language or crawler identity.
+  const locale = "en";
+  const home = `/${locale}/`;
 
   return (
     <html lang={locale}>

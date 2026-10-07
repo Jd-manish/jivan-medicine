@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { formatUsd, savingsPercent, savingsMultiple } from "@/components/price-block";
 
 type Medicine = {
@@ -24,7 +24,6 @@ type Medicine = {
 export function ComparisonTool({ locale }: { locale: string }) {
   const [medicines, setMedicines] = useState<Medicine[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<Medicine[]>([]);
   const [allData, setAllData] = useState<Medicine[]>([]);
   const [showSearch, setShowSearch] = useState(false);
 
@@ -46,20 +45,14 @@ export function ComparisonTool({ locale }: { locale: string }) {
       .catch(() => {});
   }, []);
 
-  useEffect(() => {
-    if (searchQuery.trim().length < 2) {
-      setSearchResults([]);
-      return;
-    }
+  const searchResults = useMemo(() => {
+    if (searchQuery.trim().length < 2) return [];
     const term = searchQuery.toLowerCase();
-    const results = allData
-      .filter(
-        (m) =>
-          m.name.toLowerCase().includes(term) ||
-          m.genericSalt.toLowerCase().includes(term)
+    return allData
+      .filter((medicine) =>
+        medicine.name.toLowerCase().includes(term) || medicine.genericSalt.toLowerCase().includes(term),
       )
       .slice(0, 5);
-    setSearchResults(results);
   }, [searchQuery, allData]);
 
   function addMedicine(med: Medicine) {
@@ -69,7 +62,6 @@ export function ComparisonTool({ locale }: { locale: string }) {
     setMedicines(next);
     localStorage.setItem("jivan-compare", JSON.stringify(next.map((m) => m.id)));
     setSearchQuery("");
-    setSearchResults([]);
     setShowSearch(false);
   }
 

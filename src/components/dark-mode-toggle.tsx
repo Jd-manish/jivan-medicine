@@ -1,30 +1,41 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 
-/**
- * Dark mode toggle. Persists choice in localStorage.
- * Respects system preference as default.
- */
+type Theme = "light" | "dark";
+const THEME_CHANGE_EVENT = "jivan-theme-change";
+
+function getThemeSnapshot(): Theme {
+  if (typeof window === "undefined") return "light";
+  const saved = localStorage.getItem("jivan-theme");
+  if (saved === "light" || saved === "dark") return saved;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function subscribeToTheme(onChange: () => void): () => void {
+  window.addEventListener(THEME_CHANGE_EVENT, onChange);
+  window.addEventListener("storage", onChange);
+  const media = window.matchMedia("(prefers-color-scheme: dark)");
+  media.addEventListener("change", onChange);
+  return () => {
+    window.removeEventListener(THEME_CHANGE_EVENT, onChange);
+    window.removeEventListener("storage", onChange);
+    media.removeEventListener("change", onChange);
+  };
+}
+
 export function DarkModeToggle() {
-  const [theme, setTheme] = useState<"light" | "dark" | "system">("system");
+  const theme = useSyncExternalStore(subscribeToTheme, getThemeSnapshot, () => "light");
 
   useEffect(() => {
-    const saved = localStorage.getItem("jivan-theme") as "light" | "dark" | null;
-    if (saved) {
-      setTheme(saved);
-      document.documentElement.setAttribute("data-theme", saved);
-    } else {
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setTheme(prefersDark ? "dark" : "light");
-    }
-  }, []);
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
 
   function toggle() {
-    const next = theme === "dark" ? "light" : "dark";
-    setTheme(next);
-    document.documentElement.setAttribute("data-theme", next);
+    const next: Theme = theme === "dark" ? "light" : "dark";
     localStorage.setItem("jivan-theme", next);
+    document.documentElement.setAttribute("data-theme", next);
+    window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
   }
 
   return (

@@ -3,10 +3,11 @@ import Link from "next/link";
 import { AdSlot } from "@/components/ad-slot";
 import { MoleculeArt } from "@/components/medical-art";
 import { articleCategories, articles, getArticlesByCategory, type ArticleCategory } from "@/lib/articles";
-import { isValidLocale, supportedLocales } from "@/lib/i18n";
+import { isValidLocale } from "@/lib/i18n";
+import { localizedAlternates, localizedRobots, SITE_URL } from "@/lib/seo";
 
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://jivan.health";
+const SITE = SITE_URL;
 
 type SearchParams = Promise<{ category?: string }>;
 
@@ -27,10 +28,8 @@ export async function generateMetadata({
       "generic medicine safety",
       "medication case studies",
     ],
-    alternates: {
-      canonical: `/${locale}/articles`,
-      languages: Object.fromEntries(supportedLocales.map((alt) => [alt, `/${alt}/articles`])),
-    },
+    alternates: localizedAlternates(locale, "articles"),
+    robots: localizedRobots(locale),
     openGraph: {
       type: "website",
       title: "Medicine Cost Guides and Case Studies | Jivan",

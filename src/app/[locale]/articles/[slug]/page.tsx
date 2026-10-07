@@ -10,19 +10,19 @@ import { TakeawaysBlock } from "@/components/takeaways-block";
 import { buildInsightText, getInsightSpec } from "@/lib/article-data-insights";
 import { getRolesFor, getTakeawaysFor } from "@/lib/article-takeaways";
 import { articles, getArticleBySlug, getRelatedArticles, resolveLegacySlug } from "@/lib/articles";
-import { isValidLocale, supportedLocales, t } from "@/lib/i18n";
+import { isValidLocale, primaryLocales, t } from "@/lib/i18n";
+import { isSeoLocale, localizedAlternates, localizedRobots, SITE_URL } from "@/lib/seo";
 import { getCatalogInsight } from "@/lib/medicines";
 import { P } from "@/lib/ui-panels";
 import { ui } from "@/lib/ui-core";
 
 
 type PageParams = { locale: string; slug: string };
-const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://jivan.health";
+const SITE = SITE_URL;
 
 /** Pre-render the full library for the primary locales; others render on demand. */
 export function generateStaticParams() {
-  const primary = ["en", "de", "fr", "es", "it"];
-  return primary.flatMap((locale) => articles.map((article) => ({ locale, slug: article.slug })));
+  return primaryLocales.flatMap((locale) => articles.map((article) => ({ locale, slug: article.slug })));
 }
 
 export async function generateMetadata({ params }: { params: Promise<PageParams> }): Promise<Metadata> {
@@ -41,23 +41,14 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
    * 24-way duplicate pages. Keep them accessible to users and linked,
    * but exclude them from the index.
    */
-  const CURATED_ARTICLE_LOCALES = ["en", "de", "fr", "es", "it"] as const;
-  const isCuratedLocale = (CURATED_ARTICLE_LOCALES as readonly string[]).includes(locale);
+  const isCuratedLocale = isSeoLocale(locale);
 
   return {
     title: article.title,
     description: article.metaDescription,
     keywords: article.keywords,
-    alternates: {
-      canonical: `/${locale}/articles/${slug}`,
-      languages: Object.fromEntries([
-        ...CURATED_ARTICLE_LOCALES.map((alt) => [alt, `/${alt}/articles/${slug}`] as const),
-        ["x-default", `/en/articles/${slug}`] as const,
-      ]),
-    },
-    robots: isCuratedLocale
-      ? { index: true, follow: true }
-      : { index: false, follow: true },
+    alternates: localizedAlternates(locale, `articles/${slug}`),
+    robots: isCuratedLocale ? localizedRobots(locale) : { index: false, follow: true },
     openGraph: {
       type: "article",
       title: article.title,
@@ -107,14 +98,12 @@ export default async function ArticleDetailPage({ params }: { params: Promise<Pa
     description: article.metaDescription,
     inLanguage: locale,
     dateModified: article.updatedAt,
-    datePublished: article.publishedAt ?? article.updatedAt,
+    ...(article.publishedAt ? { datePublished: article.publishedAt } : {}),
     keywords: article.keywords.join(", "),
     articleSection: article.category,
     wordCount: article.sections.reduce((sum, s) => sum + s.paragraphs.join(" ").split(/\s+/).length, 0),
-    mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE}/${locale}/articles/${article.slug}` },
-    author: { "@type": "Person", name: roles.author.replace(", Jivan Editorial Team", ""), url: `${SITE}/${locale}/authors/${roles.authorSlug}`, jobTitle: roles.author.replace(", Jivan Editorial Team", "") },
-    reviewedBy: { "@type": "Organization", name: roles.reviewer, url: `${SITE}/${locale}/editorial-policy` },
-    editor: { "@type": "Organization", name: "Jivan Editorial Review Board", url: `${SITE}/${locale}/editorial-policy` },
+    mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE}/${locale}/articles/${article.slug}/` },
+    author: { "@type": "Organization", name: "Jivan Editorial Team", department: roles.author.replace(", Jivan Editorial Team", ""), url: `${SITE}/${locale}/authors/${roles.authorSlug}/` },
     publisher: { "@type": "Organization", name: "Jivan", url: SITE },
     citation: article.references.map((ref) => ({
       "@type": "CreativeWork",
@@ -186,9 +175,10 @@ export default async function ArticleDetailPage({ params }: { params: Promise<Pa
               </Link>
             </span>
             <span aria-hidden> </span>
-            <time dateTime={article.publishedAt ?? article.updatedAt}>Published {(article.publishedAt ? new Date(article.publishedAt) : updated).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</time>
-            <span aria-hidden> </span>
-            <time dateTime={article.updatedAt}>Last reviewed {updated.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</time>
+            {article.publishedAt ? (
+              <time dateTime={article.publishedAt}>Published {new Date(article.publishedAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</time>
+            ) : null}
+            <time dateTime={article.updatedAt}>Updated {updated.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</time>
             <span aria-hidden> </span>
             <span>{article.references.length} cited sources</span>
           </div>
@@ -319,7 +309,6 @@ export default async function ArticleDetailPage({ params }: { params: Promise<Pa
             locale={locale}
             author={roles.author}
             authorSlug={roles.authorSlug}
-            reviewer={roles.reviewer}
             note={roles.note}
             updated={updated}
             sourceCount={article.references.length}

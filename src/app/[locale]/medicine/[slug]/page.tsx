@@ -3,21 +3,22 @@ import Link from "next/link";
 import { CapsuleArt, MoleculeArt } from "@/components/medical-art";
 import { formatUsd, PriceCompare, PriceStatusBadge, savingsPercent } from "@/components/price-block";
 import { ShareSavings, QuickShareButton } from "@/components/share-savings";
-import { isValidLocale, t } from "@/lib/i18n";
+import { isValidLocale, primaryLocales, t } from "@/lib/i18n";
 import { P } from "@/lib/ui-panels";
+import { localizedAlternates, SITE_URL } from "@/lib/seo";
 import { ui } from "@/lib/ui-core";
 import { ensureMedicineSeeded, getAlternatives, getMedicineBySlug } from "@/lib/medicines";
+import medicineSlugManifest from "@/lib/medicine-slug-manifest.json";
+
+const medicineDetailSlugs = new Set(medicineSlugManifest.generatedMedicineSlugs);
 
 export const dynamicParams = false;
 
 export async function generateStaticParams() {
-  const { getMedicineCatalog } = await import("@/lib/medicines");
-  const locales = ["en", "de", "fr", "es", "it"] as const;
-  const { rows } = await getMedicineCatalog({ verifiedOnly: true, pageSize: 500, sort: "savings" });
   const params: PageParams[] = [];
-  for (const locale of locales) {
-    for (const m of rows) {
-      params.push({ locale, slug: m.slug });
+  for (const locale of primaryLocales) {
+    for (const slug of medicineSlugManifest.generatedMedicineSlugs) {
+      params.push({ locale, slug });
     }
   }
   return params;
@@ -39,23 +40,17 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
    * Search-quality control, two layers:
    * 1) Only hand-researched anchor entries are indexable. Derived variants
    *    are excluded to prevent the mass-produced thin/duplicate signal.
-   * 2) Indexation only in curated locales   secondary locales share the same
+   * 2) Indexation only in curated locales — secondary locales share the same
    *    English content and would appear as 24-way duplicate medicine pages.
    */
   const isResearchAnchor = medicine.priceStatus === "market_checked";
-  const CURATED_LOCALES = ["en", "de", "fr", "es", "it"] as const;
-  const isCuratedLocale = (CURATED_LOCALES as readonly string[]).includes(locale);
+  const isCuratedLocale = (primaryLocales as readonly string[]).includes(locale);
   const indexable = isResearchAnchor && isCuratedLocale;
 
-  const allLocales = ["en", "de", "fr", "es", "it", "pt", "nl", "pl", "sv", "da", "fi", "cs", "ro", "hu", "el", "sk", "sl", "hr", "bg", "et", "lv", "lt", "mt", "ga"];
-
   return {
-    title: `${medicine.name}   Indian alternative price, uses and dosage`,
-    description: `${medicine.name} (${medicine.genericSalt}) costs ${formatUsd(medicine.usEuPrice, "en")} in the US/EU versus ${formatUsd(medicine.indiaPrice, "en")} in India   about ${savings}% lower. Uses, dosage, side effects and manufacturer details.`,
-    alternates: {
-      canonical: `/${locale}/medicine/${slug}`,
-      languages: Object.fromEntries(allLocales.map(l => [l, `/${l}/medicine/${slug}`])),
-    },
+    title: `${medicine.name} — Indian alternative price, uses and dosage`,
+    description: `${medicine.name} (${medicine.genericSalt}) costs ${formatUsd(medicine.usEuPrice, "en")} in the US/EU versus ${formatUsd(medicine.indiaPrice, "en")} in India — about ${savings}% lower. Uses, dosage, side effects and manufacturer details.`,
+    alternates: localizedAlternates(locale, `medicine/${slug}`),
     robots: indexable
       ? { index: true, follow: true, googleBot: { index: true, follow: true, "max-snippet": -1 } }
       : { index: false, follow: true },
@@ -84,34 +79,30 @@ export default async function MedicineDetailPage({ params }: { params: Promise<P
   
 
   const copy = t(locale as any);
-  const alternatives = await getAlternatives(medicine.genericSalt, medicine.id, 6);
+  const alternativeCandidates = await getAlternatives(medicine.genericSalt, medicine.id, 100);
+  const alternatives = alternativeCandidates
+    .filter((alternative) => medicineDetailSlugs.has(alternative.slug))
+    .slice(0, 6);
   const savings = savingsPercent(medicine.usEuPrice, medicine.indiaPrice);
 
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Drug",
     name: medicine.name,
+    url: `${SITE_URL}/${locale}/medicine/${slug}/`,
     activeIngredient: medicine.genericSalt,
     manufacturer: { "@type": "Organization", name: medicine.company },
     dosageForm: medicine.form,
     description: medicine.description,
     prescriptionStatus: medicine.prescriptionRequired ? "PrescriptionOnly" : "OTC",
-    offers: {
-      "@type": "AggregateOffer",
-      lowPrice: Math.round(medicine.indiaPrice / 100),
-      highPrice: Math.round(medicine.usEuPrice / 100),
-      priceCurrency: "USD",
-      offerCount: alternatives.length + 1,
-      availability: "https://schema.org/InStock",
-    },
   };
 
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: `https://jivan.health/${locale}` },
-      { "@type": "ListItem", position: 2, name: "Medicines", item: `https://jivan.health/${locale}/search` },
+      { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/${locale}/` },
+      { "@type": "ListItem", position: 2, name: "Medicines", item: `${SITE_URL}/${locale}/search/` },
       { "@type": "ListItem", position: 3, name: medicine.name },
     ],
   };
@@ -184,6 +175,9 @@ export default async function MedicineDetailPage({ params }: { params: Promise<P
               ) : null}
               <p className="mt-2 text-xs text-ink-400">
                 {ui(locale, P.medMktNote)}
+              </p>
+              <p className="mt-2 text-xs leading-5 text-ink-500">
+                This is a catalogue reference, not a live pharmacy offer. The public dataset does not provide an individual source URL or current quote for every medicine entry; confirm the exact product, pack, stock, and price directly with a licensed supplier.
               </p>
             </div>
           </section>

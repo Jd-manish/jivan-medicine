@@ -8,6 +8,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SupportButton } from "@/components/support-button";
 import { BackToTop } from "@/components/back-to-top";
 import { isValidLocale, supportedLocales, t } from "@/lib/i18n";
+import { localizedRobots } from "@/lib/seo";
 
 // Fully static — no DB, no server runtime needed.
 
@@ -21,9 +22,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  if (false) {
-    return {};
-  }
+  if (!isValidLocale(locale)) return {};
 
   const copy = t(locale as any);
 
@@ -33,6 +32,7 @@ export async function generateMetadata({
       template: `%s | ${copy.brand}`,
     },
     description: copy.heroSubtitle,
+    robots: localizedRobots(locale),
   };
 }
 

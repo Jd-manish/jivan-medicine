@@ -1,10 +1,17 @@
 import type { Metadata } from "next";
 import { isValidLocale } from "@/lib/i18n";
+import { localizedAlternates, localizedRobots } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Medical Disclaimer",
-  description: "Important medical disclaimer for medicine comparisons shown on Jivan.",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isValidLocale(locale)) return {};
+  return {
+    title: "Medical Disclaimer",
+    description: "Important medical disclaimer for medicine comparisons shown on Jivan.",
+    alternates: localizedAlternates(locale, "medical-disclaimer"),
+    robots: localizedRobots(locale),
+  };
+}
 
 export default async function MedicalDisclaimerPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;

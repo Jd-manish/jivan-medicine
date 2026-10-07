@@ -1,19 +1,33 @@
 /**
  * Surgery / Operation Cost Comparison — India vs US/EU/Australia.
  *
- * All prices are approximate USD ranges based on publicly available
- * hospital pricing (2024-2026). Sources: Medigo, Patients Beyond Border,
- * Medical Tourism Association, individual hospital published rates.
+ * Market prices are source-reported references—not provider quotes. They may
+ * be ranges, starting prices, point estimates, or claims-based hospital figures;
+ * source currency and procedure/package scope are retained in each record.
+ * Clickable price evidence is maintained in surgery-price-evidence.ts.
  *
- * TO ADD A NEW SURGERY: Just add an entry to the array below.
- * The page will automatically pick it up.
+ * TO ADD A NEW SURGERY: add an entry to the array below and provide evidence
+ * for every displayed market. The static pages pick it up automatically.
  */
+
+import { surgeryPriceEvidence, type SurgeryPriceEvidence } from "@/lib/surgery-price-evidence";
+
+export type PriceRange = {
+  low: number;
+  high: number;
+  /** Most existing comparisons are USD; local Australian benchmarks retain AUD. */
+  currency?: "USD" | "AUD" | "EUR";
+  /** Preserve the source's distinction between a starting estimate and a range. */
+  qualifier?: "from" | "about";
+};
 
 export type Surgery = {
   slug: string;
   name: string;
   category: string;
   description: string;
+  /** Search-friendly alternate spellings, procedure names, and local-language terms. */
+  searchTerms?: string[];
   /** What the surgery treats / when you need it */
   indications: string[];
   /** Duration of the procedure */
@@ -23,13 +37,15 @@ export type Surgery = {
   /** Recovery time */
   recovery: string;
   prices: {
-    us: { low: number; high: number };
-    eu: { low: number; high: number };
-    australia: { low: number; high: number };
-    india: { low: number; high: number };
+    us: PriceRange;
+    eu: PriceRange;
+    australia: PriceRange | null;
+    india: PriceRange;
   };
-  /** Price sources — where the numbers come from */
+  /** Legacy editorial source notes retained for backward compatibility. */
   sources?: string[];
+  /** Market-by-market clickable price evidence shown beside the comparison. */
+  priceEvidence: SurgeryPriceEvidence[];
   /** Why India is cheaper — specific factors */
   whyCheaper: string[];
   /** Quality notes — accreditation, success rates */
@@ -40,7 +56,9 @@ export type Surgery = {
   questionsToAsk: string[];
 };
 
-export const surgeries: Surgery[] = [
+type SurgeryDraft = Omit<Surgery, "priceEvidence">;
+
+const surgeryDrafts: SurgeryDraft[] = [
   // ──────────────────────────────────────────────
   //  EYE
   // ──────────────────────────────────────────────
@@ -62,8 +80,8 @@ export const surgeries: Surgery[] = [
     prices: {
       us: { low: 3500, high: 10000 },
       eu: { low: 2500, high: 5500 },
-      australia: { low: 3000, high: 6000 },
-      india: { low: 180, high: 1500 },
+      australia: { low: 4700, high: 4700, currency: "AUD" },
+      india: { low: 600, high: 2000 },
     },
     sources: [
       "hexahealth.com/treatment/cataract-surgery-cost — India: ₹20,000–₹1,30,000 (2026)",
@@ -106,10 +124,10 @@ export const surgeries: Surgery[] = [
     hospitalStay: "Same-day (walk-in, walk-out)",
     recovery: "1–2 days for daily activities, 1 month for full stabilisation",
     prices: {
-      us: { low: 2000, high: 5000 },
-      eu: { low: 1800, high: 4000 },
-      australia: { low: 2500, high: 5500 },
-      india: { low: 300, high: 1000 },
+      us: { low: 4000, high: 6000 },
+      eu: { low: 919, high: 3500 },
+      australia: null,
+      india: { low: 500, high: 1200 },
     },
     whyCheaper: [
       "India is a global LASIK hub — high volume drives per-unit costs down",
@@ -149,9 +167,9 @@ export const surgeries: Surgery[] = [
     recovery: "6–12 weeks for daily activities, 3–6 months for full recovery",
     prices: {
       us: { low: 30000, high: 70000 },
-      eu: { low: 15000, high: 30000 },
-      australia: { low: 20000, high: 35000 },
-      india: { low: 3600, high: 9000 },
+      eu: { low: 12000, high: 23500 },
+      australia: { low: 23200, high: 23200, currency: "AUD" },
+      india: { low: 3600, high: 6600 },
     },
     sources: [
       "jforh.com — India: $5,500–$8,500, US: $35,000–$65,000 (2026)",
@@ -196,10 +214,10 @@ export const surgeries: Surgery[] = [
     hospitalStay: "3–5 days",
     recovery: "4–6 weeks for daily activities, 3–6 months for full recovery",
     prices: {
-      us: { low: 30000, high: 60000 },
+      us: { low: 40000, high: 80000 },
       eu: { low: 15000, high: 35000 },
-      australia: { low: 20000, high: 40000 },
-      india: { low: 4000, high: 9000 },
+      australia: { low: 25600, high: 25600, currency: "AUD" },
+      india: { low: 4350, high: 8000 },
     },
     whyCheaper: [
       "Same global implant manufacturers at India-negotiated pricing",
@@ -237,10 +255,10 @@ export const surgeries: Surgery[] = [
     hospitalStay: "1–2 days (often day surgery)",
     recovery: "6–9 months for return to sport",
     prices: {
-      us: { low: 15000, high: 35000 },
-      eu: { low: 8000, high: 20000 },
-      australia: { low: 10000, high: 25000 },
-      india: { low: 2000, high: 5000 },
+      us: { low: 27500, high: 27500 },
+      eu: { low: 10000, high: 14000 },
+      australia: { low: 8000, high: 15000, currency: "AUD" },
+      india: { low: 5800, high: 8650 },
     },
     whyCheaper: [
       "Arthroscopic equipment and graft costs significantly lower in India",
@@ -277,10 +295,10 @@ export const surgeries: Surgery[] = [
     hospitalStay: "3–7 days",
     recovery: "3–6 months for bone fusion, 6–12 months for full recovery",
     prices: {
-      us: { low: 50000, high: 150000 },
-      eu: { low: 25000, high: 60000 },
-      australia: { low: 30000, high: 80000 },
-      india: { low: 5000, high: 15000 },
+      us: { low: 100000, high: 100000 },
+      eu: { low: 40000, high: 55000 },
+      australia: null,
+      india: { low: 18000, high: 27600 },
     },
     whyCheaper: [
       "Spinal implant costs (pedicle screws, rods, cages) 60-80% lower in India",
@@ -321,10 +339,10 @@ export const surgeries: Surgery[] = [
     hospitalStay: "5–10 days (open), 2–4 days (TAVR)",
     recovery: "6–12 weeks (open), 2–4 weeks (TAVR)",
     prices: {
-      us: { low: 50000, high: 200000 },
-      eu: { low: 25000, high: 80000 },
-      australia: { low: 40000, high: 100000 },
-      india: { low: 3500, high: 18000 },
+      us: { low: 50000, high: 150000 },
+      eu: { low: 25000, high: 60000 },
+      australia: null,
+      india: { low: 6000, high: 12000 },
     },
     sources: [
       "afiyaindia.com — India: $4,800–$12,000, US: $80,000+ (2025)",
@@ -369,9 +387,9 @@ export const surgeries: Surgery[] = [
     recovery: "6–12 weeks, 3–6 months for full recovery",
     prices: {
       us: { low: 57000, high: 150000 },
-      eu: { low: 25000, high: 80000 },
-      australia: { low: 40000, high: 100000 },
-      india: { low: 4000, high: 12000 },
+      eu: { low: 30000, high: 70000 },
+      australia: null,
+      india: { low: 5500, high: 10000 },
     },
     sources: [
       "treatmentpossible.com — India: $4,000–$6,000, US: $57,000–$150,000 (2026)",
@@ -415,10 +433,10 @@ export const surgeries: Surgery[] = [
     hospitalStay: "1–2 days",
     recovery: "1 week for daily activities, 1 month for full activity",
     prices: {
-      us: { low: 25000, high: 50000 },
-      eu: { low: 10000, high: 25000 },
-      australia: { low: 15000, high: 35000 },
-      india: { low: 2400, high: 6400 },
+      us: { low: 95000, high: 95000 },
+      eu: { low: 25000, high: 45000 },
+      australia: null,
+      india: { low: 5102, high: 5102 },
     },
     sources: [
       "afiyaindia.com — India: $2,400–$6,400, US: $30,000–$50,000+ (2025)",
@@ -462,10 +480,10 @@ export const surgeries: Surgery[] = [
     hospitalStay: "7–14 days",
     recovery: "4–6 weeks for daily activities, 3–6 months for full recovery",
     prices: {
-      us: { low: 100000, high: 250000 },
-      eu: { low: 50000, high: 100000 },
-      australia: { low: 60000, high: 120000 },
-      india: { low: 8000, high: 20000 },
+      us: { low: 400000, high: 400000 },
+      eu: { low: 95000, high: 140000 },
+      australia: null,
+      india: { low: 14000, high: 19000 },
     },
     whyCheaper: [
       "Lower surgical team and hospital fees",
@@ -504,10 +522,10 @@ export const surgeries: Surgery[] = [
     hospitalStay: "14–21 days",
     recovery: "3–6 months for full recovery",
     prices: {
-      us: { low: 300000, high: 600000 },
-      eu: { low: 150000, high: 300000 },
-      australia: { low: 200000, high: 400000 },
-      india: { low: 25000, high: 55000 },
+      us: { low: 750000, high: 750000 },
+      eu: { low: 250000, high: 250000 },
+      australia: null,
+      india: { low: 35000, high: 55000 },
     },
     whyCheaper: [
       "India pioneered living-donor liver transplant — high surgical expertise at lower cost",
@@ -550,9 +568,9 @@ export const surgeries: Surgery[] = [
     recovery: "1–2 weeks for visible bruising, 6–12 months for final shape",
     prices: {
       us: { low: 5000, high: 15000 },
-      eu: { low: 4000, high: 10000 },
-      australia: { low: 6000, high: 15000 },
-      india: { low: 800, high: 2500 },
+      eu: { low: 4000, high: 12000 },
+      australia: { low: 10300, high: 10300, currency: "AUD" },
+      india: { low: 850, high: 6200 },
     },
     whyCheaper: [
       "Lower surgeon and anaesthesia fees",
@@ -590,10 +608,10 @@ export const surgeries: Surgery[] = [
     hospitalStay: "2–4 days",
     recovery: "2–4 weeks for daily activities, 6–12 weeks for full recovery",
     prices: {
-      us: { low: 15000, high: 35000 },
-      eu: { low: 10000, high: 20000 },
-      australia: { low: 12000, high: 25000 },
-      india: { low: 3000, high: 7000 },
+      us: { low: 15000, high: 30000 },
+      eu: { low: 12000, high: 25000 },
+      australia: { low: 14300, high: 14300, currency: "AUD" },
+      india: { low: 3900, high: 8000 },
     },
     whyCheaper: [
       "Same laparoscopic staplers and equipment at lower procurement costs",
@@ -633,8 +651,8 @@ export const surgeries: Surgery[] = [
     prices: {
       us: { low: 5000, high: 15000 },
       eu: { low: 3000, high: 8000 },
-      australia: { low: 4000, high: 10000 },
-      india: { low: 500, high: 2000 },
+      australia: null,
+      india: { low: 914, high: 3400 },
     },
     whyCheaper: [
       "India manufactures surgical mesh (Ethicon, Brahmos) locally",
@@ -674,10 +692,10 @@ export const surgeries: Surgery[] = [
     hospitalStay: "Outpatient (dental clinic)",
     recovery: "3–6 months for osseointegration, then 2–4 weeks for crown",
     prices: {
-      us: { low: 3000, high: 6000 },
+      us: { low: 3200, high: 3200 },
       eu: { low: 2000, high: 4500 },
-      australia: { low: 3000, high: 7000 },
-      india: { low: 300, high: 1000 },
+      australia: null,
+      india: { low: 500, high: 1100 },
     },
     whyCheaper: [
       "Same implant brands (Straumann, Nobel Biocare, Osstem) at lower distribution costs",
@@ -720,8 +738,8 @@ export const surgeries: Surgery[] = [
     prices: {
       us: { low: 15000, high: 50000 },
       eu: { low: 8000, high: 25000 },
-      australia: { low: 10000, high: 30000 },
-      india: { low: 2000, high: 6000 },
+      australia: null,
+      india: { low: 2650, high: 4450 },
     },
     whyCheaper: [
       "Lower surgical and anaesthesia fees",
@@ -761,9 +779,9 @@ export const surgeries: Surgery[] = [
     recovery: "2–4 weeks (TURP), 4–8 weeks (radical)",
     prices: {
       us: { low: 10000, high: 40000 },
-      eu: { low: 6000, high: 20000 },
-      australia: { low: 8000, high: 30000 },
-      india: { low: 1500, high: 6000 },
+      eu: { low: 17000, high: 20000 },
+      australia: null,
+      india: { low: 6100, high: 14150 },
     },
     whyCheaper: [
       "Same robotic systems (da Vinci) available at major Indian centres",
@@ -784,13 +802,349 @@ export const surgeries: Surgery[] = [
       "What nerve-sparing technique will be used?",
     ],
   },
+  // ──────────────────────────────────────────────
+  //  NEW PROCEDURES
+  // ──────────────────────────────────────────────
+  {
+    slug: "appendectomy",
+    name: "Appendectomy (Appendix Removal)",
+    category: "General Surgery",
+    searchTerms: ["appendix", "appendix removal", "अपेंडिक्स", "appendicitis", "appendicectomy"],
+    description:
+      "Surgical removal of an inflamed or infected appendix. Most uncomplicated cases are treated with laparoscopic surgery; perforation or abscess can require a more complex admission.",
+    indications: [
+      "Appendicitis confirmed by clinical assessment and imaging",
+      "Concern for perforation, abscess, or worsening infection",
+      "A surgeon recommends removal after considering non-operative treatment",
+    ],
+    duration: "About 1 hour; longer for complicated disease",
+    hospitalStay: "Usually 1–3 days; varies with infection and recovery",
+    recovery: "Often 1–3 weeks after uncomplicated laparoscopic surgery",
+    prices: {
+      us: { low: 15000, high: 30000 },
+      eu: { low: 8500, high: 13500 },
+      australia: { low: 6235, high: 7747, currency: "AUD" },
+      india: { low: 1600, high: 2000 },
+    },
+    whyCheaper: [
+      "Private hospital, surgeon, and room charges differ substantially by country and facility",
+      "Published India prices are often package estimates; emergency complications can change the total",
+      "Travel is not an appropriate substitute for urgent assessment of suspected appendicitis",
+    ],
+    quality:
+      "Appendectomy is performed in accredited hospitals in India and internationally. Ask about the surgeon's laparoscopic experience, emergency backup, infection-control protocols, and what the estimate includes.",
+    risks: [
+      "Bleeding, infection, or injury to nearby structures",
+      "Abscess or wound complications, especially after perforation",
+      "Anesthesia-related complications",
+    ],
+    questionsToAsk: [
+      "Is the case uncomplicated, perforated, or associated with an abscess?",
+      "Does the package include anesthesia, imaging, pathology, medicines, and hospital stay?",
+      "What follow-up is required before travel?",
+    ],
+  },
+  {
+    slug: "gallbladder-removal",
+    name: "Gallbladder Removal (Cholecystectomy)",
+    category: "General Surgery",
+    searchTerms: ["cholecystectomy", "gallbladder surgery", "gallstones", "gall bladder", "पित्त की थैली"],
+    description:
+      "Surgical removal of the gallbladder, most often by laparoscopic keyhole surgery for symptomatic gallstones. Emergency inflammation, bile-duct stones, or open surgery can change the plan and cost.",
+    indications: [
+      "Recurrent symptoms from gallstones",
+      "Acute gallbladder inflammation when a surgeon recommends surgery",
+      "Other gallbladder conditions assessed by a qualified clinician",
+    ],
+    duration: "About 1–2 hours",
+    hospitalStay: "Same day to 2 nights for uncomplicated laparoscopic surgery",
+    recovery: "Often 1–3 weeks for routine activity after laparoscopic surgery",
+    prices: {
+      us: { low: 12000, high: 25000 },
+      eu: { low: 9300, high: 9300, qualifier: "from" },
+      australia: { low: 7300, high: 7300, currency: "AUD" },
+      india: { low: 1500, high: 3000 },
+    },
+    whyCheaper: [
+      "Hospital package scope and insurance arrangements differ between markets",
+      "Laparoscopic and open procedures are not interchangeable price points",
+      "Medical-tourism quotes may exclude travel, follow-up, and management of complications",
+    ],
+    quality:
+      "Laparoscopic cholecystectomy is available at established Indian hospitals. Confirm the surgeon's experience, availability of endoscopy/ERCP if needed, and the plan for follow-up after returning home.",
+    risks: [
+      "Bile leak or bile-duct injury",
+      "Bleeding, infection, or anesthesia complications",
+      "Conversion to open surgery or a longer stay if the case is complex",
+    ],
+    questionsToAsk: [
+      "Is the quote for laparoscopic or open surgery?",
+      "Does it include pre-operative imaging and any bile-duct procedure?",
+      "How long should I remain near the hospital after discharge?",
+    ],
+  },
+  {
+    slug: "hysterectomy",
+    name: "Hysterectomy (Uterus Removal)",
+    category: "Gynaecology",
+    searchTerms: ["uterus removal", "womb removal", "uterine surgery", "hysterectomy surgery"],
+    description:
+      "Surgical removal of the uterus for selected gynaecological conditions. Abdominal, vaginal, laparoscopic, and robotic approaches have different indications, recovery periods, and prices.",
+    indications: [
+      "Selected fibroids, heavy bleeding, endometriosis, or pelvic conditions after specialist assessment",
+      "Some cancers or pre-cancerous conditions when recommended by a gynaecologic oncologist",
+      "Symptoms not adequately managed with appropriate alternatives",
+    ],
+    duration: "About 1–4 hours depending on approach and complexity",
+    hospitalStay: "Usually 1–5 days depending on approach and recovery",
+    recovery: "Often 2–8 weeks; the surgeon's advice depends on the procedure",
+    prices: {
+      us: { low: 30000, high: 55000 },
+      eu: { low: 8500, high: 9500 },
+      australia: { low: 11340, high: 16167, currency: "AUD" },
+      india: { low: 3500, high: 3500, qualifier: "from" },
+    },
+    whyCheaper: [
+      "Hospital charges, surgical approach, pathology, and inpatient days drive much of the price variation",
+      "A low quote may not include oncology care, reconstruction, medicines, or follow-up",
+      "Medical decisions should be based on clinical need, not destination price alone",
+    ],
+    quality:
+      "Indian centres offer open, vaginal, laparoscopic, and robotic procedures. Ask whether the surgeon and hospital are equipped for the specific diagnosis and whether pathology and oncology review are included when relevant.",
+    risks: [
+      "Bleeding, infection, blood clots, or injury to adjacent organs",
+      "Anesthesia-related complications",
+      "The operation permanently ends the ability to carry a pregnancy; discuss fertility-preserving options where relevant",
+    ],
+    questionsToAsk: [
+      "Which surgical approach is recommended and why?",
+      "Will the ovaries or cervix be removed, and what are the implications?",
+      "Does the estimate include pathology, follow-up, and treatment of complications?",
+    ],
+  },
+  {
+    slug: "ivf-treatment",
+    name: "IVF (In Vitro Fertilisation)",
+    category: "Fertility Treatment",
+    searchTerms: ["in vitro fertilization", "in vitro fertilisation", "fertility treatment", "test tube baby", "IVF cycle"],
+    description:
+      "Assisted reproduction in which eggs are retrieved, fertilised in a laboratory, and an embryo is transferred. A quoted cycle may exclude medicines, ICSI, donor services, genetic testing, storage, or later transfers.",
+    indications: [
+      "Infertility assessed by a qualified fertility specialist",
+      "Treatment plan determined after reviewing both partners and prior care",
+      "A specific assisted-reproduction option recommended after counselling",
+    ],
+    duration: "A treatment cycle typically spans several weeks",
+    hospitalStay: "Usually outpatient visits; egg retrieval involves a short procedure visit",
+    recovery: "Most routine activities resume quickly, but clinic monitoring continues through the cycle",
+    prices: {
+      us: { low: 17500, high: 26000 },
+      eu: { low: 5000, high: 6000, currency: "EUR" },
+      australia: { low: 13340, high: 13340, currency: "AUD" },
+      india: { low: 3500, high: 3500, qualifier: "from" },
+    },
+    whyCheaper: [
+      "Clinic package contents, medicine pricing, and rebate/insurance systems differ by country",
+      "The headline cycle price is not the total cost if ICSI, donor services, testing, storage, or frozen transfers are needed",
+      "Success rates depend strongly on age, diagnosis, and treatment history; price is not a proxy for outcome",
+    ],
+    quality:
+      "India has established fertility clinics and specialist laboratories. Verify clinic registration, laboratory standards, the named clinician, counselling, consent, data privacy, and how outcomes are reported for patients with a profile like yours.",
+    risks: [
+      "Ovarian hyperstimulation and complications of egg retrieval",
+      "Multiple pregnancy or pregnancy-related complications",
+      "Emotional, financial, and legal considerations that vary by treatment and country",
+    ],
+    questionsToAsk: [
+      "Does the estimate include stimulation medicines, monitoring, retrieval, fertilisation, and transfer?",
+      "What are the clinic's live-birth outcomes for my age and diagnosis?",
+      "What local law applies to donor material, embryo storage, and treatment eligibility?",
+    ],
+  },
+  {
+    slug: "knee-arthroscopy",
+    name: "Knee Arthroscopy",
+    category: "Orthopaedic",
+    searchTerms: ["arthroscopic knee surgery", "meniscus surgery", "knee scope", "knee keyhole surgery"],
+    description:
+      "A camera-guided procedure through small incisions to assess or treat selected knee-joint problems. Diagnostic arthroscopy, meniscus repair, and ligament reconstruction are different procedures and should not share a single price assumption.",
+    indications: [
+      "Selected meniscus tears or loose fragments after clinical assessment",
+      "Persistent mechanical symptoms when imaging and examination support surgery",
+      "A specialist recommends arthroscopy after discussing non-operative options",
+    ],
+    duration: "About 30 minutes to 2 hours depending on the repair",
+    hospitalStay: "Often day surgery; longer if a more complex repair is performed",
+    recovery: "Several weeks; rehabilitation varies by the procedure performed",
+    prices: {
+      us: { low: 3485, high: 3485, qualifier: "about" },
+      eu: { low: 2500, high: 22000 },
+      australia: { low: 4610, high: 4610, currency: "USD", qualifier: "about" },
+      india: { low: 975, high: 3030 },
+    },
+    whyCheaper: [
+      "A diagnostic scope and a repair with implants are not equivalent packages",
+      "Facility, anesthesia, imaging, and physiotherapy may be billed separately",
+      "Medical-tourism comparisons should specify the exact repair and follow-up plan",
+    ],
+    quality:
+      "Arthroscopy is available at Indian orthopaedic centres. Ask for the operative plan, surgeon volume for that repair, implant details if applicable, and a written rehabilitation plan that can continue after travel.",
+    risks: [
+      "Infection, bleeding, stiffness, or blood clots",
+      "Persistent symptoms if the underlying problem is not improved by arthroscopy",
+      "Risks associated with anesthesia and post-operative travel",
+    ],
+    questionsToAsk: [
+      "What exact procedure is included: diagnostic scope, meniscus repair, or another repair?",
+      "Are implants, anesthesia, hospital stay, and physiotherapy included?",
+      "When is it safe to fly and who will manage rehabilitation at home?",
+    ],
+  },
+  {
+    slug: "pacemaker-implantation",
+    name: "Pacemaker Implantation",
+    category: "Cardiac",
+    searchTerms: ["heart pacemaker", "cardiac device implantation", "pacemaker surgery", "bradycardia device"],
+    description:
+      "Placement of a cardiac device to help regulate an abnormal heart rhythm. Single-, dual-, and multi-chamber devices have different device and procedure costs; the treating cardiologist determines the appropriate device.",
+    indications: [
+      "A heart-rhythm diagnosis for which a cardiologist recommends pacing",
+      "Symptoms or rhythm findings assessed with ECG and specialist testing",
+      "A device type selected for the patient's clinical condition",
+    ],
+    duration: "About 1–3 hours depending on the device and case",
+    hospitalStay: "Often 1–3 nights for implantation and monitoring",
+    recovery: "Several weeks of wound care and activity restrictions; device checks are ongoing",
+    prices: {
+      us: { low: 20000, high: 100000 },
+      eu: { low: 13000, high: 13000, qualifier: "from" },
+      australia: { low: 15406, high: 23674, currency: "AUD" },
+      india: { low: 5200, high: 10800 },
+    },
+    whyCheaper: [
+      "The device model and number of leads drive a large share of the total cost",
+      "Hospital monitoring, follow-up programming, and complication coverage should be itemised",
+      "A price comparison cannot establish which device is medically appropriate",
+    ],
+    quality:
+      "Major Indian cardiac hospitals implant pacemakers and provide electrophysiology follow-up. Confirm the named cardiologist, device brand/model, emergency support, remote monitoring, and a plan for device checks after returning home.",
+    risks: [
+      "Bleeding, infection, lead displacement, or pneumothorax",
+      "Device or lead problems requiring further procedures",
+      "Need for lifelong device checks and battery replacement planning",
+    ],
+    questionsToAsk: [
+      "Which device and lead configuration is recommended, and why?",
+      "Does the estimate include the device, procedure, monitoring, and follow-up checks?",
+      "Who will interrogate the device after I return home?",
+    ],
+  },
+  {
+    slug: "shoulder-replacement",
+    name: "Shoulder Replacement (Shoulder Arthroplasty)",
+    category: "Orthopaedic",
+    searchTerms: ["shoulder arthroplasty", "shoulder implant", "reverse shoulder replacement", "shoulder joint replacement"],
+    description:
+      "Replacement of some or all damaged parts of the shoulder joint with an implant. Anatomic, reverse, partial, and revision replacements have different indications, implant requirements, and costs.",
+    indications: [
+      "Severe shoulder arthritis or joint damage after specialist assessment",
+      "Selected complex fractures or rotator-cuff-related joint disease",
+      "Persistent pain and functional limitation despite appropriate non-surgical care",
+    ],
+    duration: "About 2–3 hours",
+    hospitalStay: "Usually 2–5 days, depending on recovery and hospital protocol",
+    recovery: "Several months of staged rehabilitation; restrictions depend on implant and procedure",
+    prices: {
+      us: { low: 10000, high: 30000 },
+      eu: { low: 7000, high: 25000 },
+      australia: { low: 25189, high: 30383, currency: "AUD" },
+      india: { low: 1500, high: 7000 },
+    },
+    whyCheaper: [
+      "Implant type, brand, and revision status materially affect the hospital quote",
+      "Rehabilitation and follow-up make up an important part of the total episode cost",
+      "A package should identify the implant and any excluded physiotherapy or imaging",
+    ],
+    quality:
+      "Indian tertiary orthopaedic hospitals perform shoulder arthroplasty. Ask whether the surgeon routinely performs the exact replacement type and whether implant records and rehabilitation instructions will travel with you.",
+    risks: [
+      "Infection, dislocation, fracture, or nerve injury",
+      "Stiffness or implant loosening over time",
+      "Long rehabilitation and the need for follow-up imaging",
+    ],
+    questionsToAsk: [
+      "Is anatomic, reverse, partial, or revision replacement planned?",
+      "Which implant manufacturer and model are included in the quote?",
+      "What physiotherapy and follow-up will be available after travel?",
+    ],
+  },
+  {
+    slug: "tonsillectomy",
+    name: "Tonsillectomy (Tonsil Removal)",
+    category: "ENT",
+    searchTerms: ["tonsil removal", "tonsil surgery", "tonsils removed", "tonsillitis operation"],
+    description:
+      "Surgical removal of the tonsils for selected recurrent infections, obstruction, or other conditions. Coblation, laser, and conventional techniques differ; adenoid removal may be a separate or combined procedure.",
+    indications: [
+      "Recurrent tonsillitis meeting a clinician's criteria",
+      "Obstructive symptoms or sleep-disordered breathing assessed by an ENT specialist",
+      "Other tonsil conditions for which surgery is recommended",
+    ],
+    duration: "About 30–90 minutes",
+    hospitalStay: "Often day surgery or one night of observation",
+    recovery: "Usually 1–2 weeks; pain can persist during healing",
+    prices: {
+      us: { low: 6500, high: 9800 },
+      eu: { low: 3000, high: 6500 },
+      australia: { low: 4810, high: 4810, currency: "AUD" },
+      india: { low: 1500, high: 3300 },
+    },
+    whyCheaper: [
+      "Technique, hospital setting, anesthesia, and whether adenoids are removed affect the package",
+      "The Australian price is a self-pay tonsil-removal package but excludes specialist consultation and follow-up",
+      "Written quotes should state whether the procedure is outpatient or inpatient",
+    ],
+    quality:
+      "ENT departments at major Indian hospitals perform tonsillectomy using standard techniques. Ask about the surgeon's approach, bleeding-management plan, post-operative pain control, and access to urgent care after discharge.",
+    risks: [
+      "Post-operative bleeding, which may require urgent treatment",
+      "Pain, dehydration, nausea, or infection during recovery",
+      "Anesthesia-related complications",
+    ],
+    questionsToAsk: [
+      "Is adenoid removal included or is this tonsillectomy alone?",
+      "Which technique is planned and what is included in the quote?",
+      "What emergency contact and follow-up are available after discharge?",
+    ],
+  },
 ];
+
+export const surgeries: Surgery[] = surgeryDrafts.map((surgery) => ({
+  ...surgery,
+  priceEvidence: surgeryPriceEvidence[surgery.slug] ?? [],
+}));
 
 /**
  * Get all unique surgery categories.
  */
 export function getSurgerCategories(): string[] {
   return [...new Set(surgeries.map((s) => s.category))];
+}
+
+/** Select a representative value without pretending that a starting price is a full range. */
+export function priceReferencePoint(price: PriceRange): number {
+  return price.qualifier === "from" ? price.low : priceMidpoint(price);
+}
+
+/** Describe the exact arithmetic basis used for an India/US percentage comparison. */
+export function priceComparisonBasis(india: PriceRange, us: PriceRange): string {
+  const describe = (market: string, price: PriceRange) => {
+    if (price.qualifier === "from") return `${market} starting price`;
+    if (price.qualifier === "about") return `${market} published point estimate`;
+    if (price.low === price.high) return `${market} published figure`;
+    return `${market} range midpoint`;
+  };
+  return `${describe("India", india)} vs ${describe("US", us)}`;
 }
 
 /**
@@ -807,18 +1161,40 @@ export function getSurgerByCategory(category: string): Surgery[] {
   return surgeries.filter((s) => s.category === category);
 }
 
-/**
- * Calculate savings percentage — accurate to 1 decimal, capped at 99.9%.
- */
+/** Calculate the selected price-reference difference; positive results are floored and capped below 100%. */
 export function surgerySavingsPercent(usPrice: number, indiaPrice: number): number {
-  if (!usPrice || usPrice <= 0) return 0;
-  const raw = (1 - indiaPrice / usPrice) * 100;
-  return Math.max(0, Math.min(99.9, Math.floor(raw * 10) / 10));
+  if (!Number.isFinite(usPrice) || usPrice <= 0 || !Number.isFinite(indiaPrice) || indiaPrice < 0) return 0;
+  const raw = ((usPrice - indiaPrice) / usPrice) * 100;
+  if (raw >= 0) return Math.min(99.9, Math.floor(raw * 10) / 10);
+  return Math.round(raw * 10) / 10;
 }
 
-/**
- * Format price range as "$X,XXX – $Y,YYY".
- */
-export function formatRange(low: number, high: number): string {
-  return `$${low.toLocaleString("en-US")} – $${high.toLocaleString("en-US")}`;
+/** Format a source-currency price range. */
+export function formatRange(low: number, high: number, currency: PriceRange["currency"] = "USD"): string {
+  const prefix = currency === "AUD" ? "A$" : currency === "EUR" ? "€" : "$";
+  const format = (value: number) => `${prefix}${value.toLocaleString("en-US")}`;
+  return low === high ? format(low) : `${format(low)}–${format(high)}`;
+}
+
+export function formatPrice(price: PriceRange | null, market?: string): string {
+  if (!price) return "No comparable published range";
+  let formatted = formatRange(price.low, price.high, price.currency);
+  if (market === "Australia" && price.currency === "USD") formatted = `US${formatted}`;
+  if (price.qualifier === "from") return `From ${formatted}`;
+  if (price.qualifier === "about") return `About ${formatted}`;
+  return formatted;
+}
+
+export function priceMidpoint(price: PriceRange): number {
+  return (price.low + price.high) / 2;
+}
+
+/** Search surgeries by title, category, description, or alternate medical/local terms. */
+export function searchSurgeries(query: string): Surgery[] {
+  const normalized = query.trim().toLocaleLowerCase();
+  if (!normalized) return [];
+  return surgeries.filter((surgery) =>
+    [surgery.name, surgery.category, surgery.description, ...(surgery.searchTerms ?? [])]
+      .some((value) => value.toLocaleLowerCase().includes(normalized)),
+  );
 }

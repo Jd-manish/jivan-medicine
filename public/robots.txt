@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://jivan.health/sitemap.xml
+Sitemap: https://jivanrx.online/sitemap.xml

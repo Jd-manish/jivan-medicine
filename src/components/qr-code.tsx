@@ -5,7 +5,7 @@
  * Uses a free QR code API (no library needed).
  */
 export function QRCodeShare({ url, size = 120 }: { url?: string; size?: number }) {
-  const qrUrl = url ?? (typeof window !== "undefined" ? window.location.href : "https://jivan.health");
+  const qrUrl = url ?? (typeof window !== "undefined" ? window.location.href : "https://jivanrx.online");
   const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(qrUrl)}&bgcolor=ffffff&color=0b1020&margin=8`;
 
   return (
