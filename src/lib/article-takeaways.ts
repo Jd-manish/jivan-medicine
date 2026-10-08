@@ -198,30 +198,26 @@ export function getRolesFor(category: string) {
     return {
       author: "Pricing Research Editor, Jivan Editorial Team",
       authorSlug: "pricing-research-editor",
-      reviewer: "Editorial Review Board — Jivan",
-      note: "Composite profile assembled from documented price patterns; not a named individual.",
+      note: "Composite profile assembled for illustration; it is not a named patient or a personal treatment recommendation.",
     };
   }
   if (category === "Safety") {
     return {
       author: "Health Safety Editor, Jivan Editorial Team",
       authorSlug: "health-safety-editor",
-      reviewer: "Editorial Review Board — Jivan",
-      note: "Checked against regulator label information before publication.",
+      note: "General educational information. Follow current regulator guidance and ask a qualified clinician about your circumstances.",
     };
   }
   if (category === "Explainer") {
     return {
       author: "Health Economics Editor, Jivan Editorial Team",
       authorSlug: "health-economics-editor",
-      reviewer: "Editorial Review Board — Jivan",
-      note: "Regulatory mechanisms verified against primary sources.",
+      note: "This explainer summarizes linked public sources; policy, eligibility, and prices can change by jurisdiction.",
     };
   }
   return {
     author: "Health Affordability Editor, Jivan Editorial Team",
-      authorSlug: "health-affordability-editor",
-    reviewer: "Editorial Review Board — Jivan",
-    note: "Sources checked against Tier-1/Tier-2 references.",
+    authorSlug: "health-affordability-editor",
+    note: "The linked sources are provided for independent checking. Price scope and availability can change; confirm with the provider and your clinician.",
   };
 }

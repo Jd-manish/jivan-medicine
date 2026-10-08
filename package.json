@@ -3,14 +3,18 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "prepare:static": "tsx scripts/prepare-static-site.ts",
+    "build:sitemap": "tsx scripts/build-sitemap.ts",
+    "build": "npm run prepare:static && npm run build:sitemap && next build && npm run validate:static",
+    "validate:static": "node scripts/validate-static-output.mjs",
     "start": "npx serve out",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "deploy": "npm run build && npx wrangler pages deploy out --project-name jivan-medicine --branch main"
+    "check": "npm run lint && npm run typecheck && npm run build",
+    "deploy:preview": "npm run build && npx wrangler pages deploy out --project-name jivan-medicine --branch arena/9d76890b-jivan-medicine"
   },
   "dependencies": {
-    "next": "16.2.6",
+    "next": "16.4.0",
     "react": "19.2.6",
     "react-dom": "19.2.6"
   },
@@ -20,9 +24,10 @@
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "eslint": "9.39.4",
-    "eslint-config-next": "16.2.6",
-    "postcss": "8.5.8",
+    "eslint-config-next": "16.4.0",
+    "postcss": "8.5.29",
     "tailwindcss": "4.1.17",
+    "tsx": "^4.23.15",
     "typescript": "5.9.3"
   }
 }

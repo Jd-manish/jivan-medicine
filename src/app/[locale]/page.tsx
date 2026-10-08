@@ -29,9 +29,11 @@ import {
   getTopSavings,
   medicineCategories,
 } from "@/lib/medicines";
-import { isValidLocale, supportedLocales, t } from "@/lib/i18n";
+import { isValidLocale, t } from "@/lib/i18n";
 import { U, ui } from "@/lib/ui-core";
 import { P } from "@/lib/ui-panels";
+import { formatPrice, surgeries, priceReferencePoint, priceComparisonBasis, surgerySavingsPercent } from "@/lib/surgeries";
+import { localizedAlternates, localizedRobots, SITE_URL } from "@/lib/seo";
 
 // Fully static — no DB, no server runtime needed.
 export const dynamic = "force-static";
@@ -49,13 +51,8 @@ export async function generateMetadata({
   return {
     title: "Compare Medicine Prices & Indian Generic Alternatives",
     description: copy.heroSubtitle,
-    alternates: {
-      canonical: `/${locale}`,
-      languages: Object.fromEntries([
-        ...supportedLocales.map((alt) => [alt, `/${alt}`] as const),
-        ["x-default", "/en"] as const,
-      ]),
-    },
+    alternates: localizedAlternates(locale),
+    robots: localizedRobots(locale),
     openGraph: {
       title: "Jivan — Medicine Access for Everyone",
       description: copy.heroSubtitle,
@@ -116,7 +113,7 @@ export default async function LocalizedHomePage({
 
   await ensureMedicineSeeded();
   const [initialCatalog, topSavings, stats] = await Promise.all([
-    getMedicineCatalog({ page: 1, pageSize: 24 }),
+    getMedicineCatalog({ page: 1, pageSize: 180 }),
     getTopSavings(6),
     getInventoryStats(),
   ]);
@@ -140,20 +137,20 @@ export default async function LocalizedHomePage({
     "@type": "Organization",
     name: "Jivan",
     description: copy.heroSubtitle,
-    url: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://jivan.health"}/${locale}`,
+    url: `${SITE_URL}/${locale}/`,
   };
 
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "Jivan — Medicine Access for Everyone",
-    url: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://jivan.health"}/${locale}`,
+    url: `${SITE_URL}/${locale}/`,
     description: copy.heroSubtitle,
     potentialAction: {
       "@type": "SearchAction",
       target: {
         "@type": "EntryPoint",
-        urlTemplate: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://jivan.health"}/${locale}/search?q={search_term_string}`,
+        urlTemplate: `${SITE_URL}/${locale}/search/?q={search_term_string}`,
       },
       "query-input": "required name=search_term_string",
     },
@@ -198,7 +195,7 @@ export default async function LocalizedHomePage({
                 {copy.ctaPrimary}
                 <span aria-hidden>→</span>
               </Link>
-              <Link href={`/${locale}#quote`} className="btn-ghost">
+              <Link href={`/${locale}/contact/`} className="btn-ghost">
                 {ui(locale, P.heroCtaQuote)}
               </Link>
             </div>
@@ -411,6 +408,59 @@ export default async function LocalizedHomePage({
       </section>
 
       <WhyCheaper locale={locale} />
+
+      {/* ---------------- OPERATIONS & PROCEDURES ---------------- */}
+      <section id="operations" className="shell scroll-mt-24 py-16 sm:py-20">
+        <div className="flex flex-wrap items-end justify-between gap-5">
+          <div className="max-w-2xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-mint-600">Operations &amp; procedures</p>
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-ink-900 sm:text-4xl">Compare procedure costs across markets</h2>
+            <p className="mt-4 text-base leading-7 text-ink-600">
+              Browse 25 source-linked operation and treatment pages. Each comparison identifies the market, currency, reported price scope, and important package caveats.
+            </p>
+          </div>
+          <Link href={`/${locale}/surgeries`} className="btn-primary">All operations &amp; procedures →</Link>
+        </div>
+
+        <div className="mt-9 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {surgeries.map((surgery) => {
+            const referenceSavings = surgerySavingsPercent(
+              priceReferencePoint(surgery.prices.us),
+              priceReferencePoint(surgery.prices.india),
+            );
+            const comparisonBasis = priceComparisonBasis(surgery.prices.india, surgery.prices.us);
+            return (
+              <Link
+                key={surgery.slug}
+                href={`/${locale}/surgeries/${surgery.slug}`}
+                className="panel panel-hover group rounded-3xl p-5 transition"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-400">{surgery.category}</p>
+                    <h3 className="mt-1 text-base font-bold text-ink-900 group-hover:text-mint-700">{surgery.name}</h3>
+                  </div>
+                  <span className="shrink-0 rounded-full bg-mint-500/10 px-2.5 py-1 text-xs font-bold text-mint-700">
+                    {Math.abs(referenceSavings)}% {referenceSavings >= 0 ? "lower*" : "higher*"}
+                  </span>
+                </div>
+                <p className="mt-3 line-clamp-2 text-sm leading-6 text-ink-600">{surgery.description}</p>
+                <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-ink-100 pt-3 text-xs">
+                  <div>
+                    <dt className="text-ink-400">India</dt>
+                    <dd className="mt-0.5 font-bold text-ink-800">{formatPrice(surgery.prices.india)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-ink-400">United States</dt>
+                    <dd className="mt-0.5 font-bold text-ink-800">{formatPrice(surgery.prices.us)}</dd>
+                  </div>
+                </dl>
+                <p className="mt-3 text-[11px] leading-5 text-ink-400">* Arithmetic using {comparisonBasis.toLowerCase()} · not a guaranteed saving or like-for-like quote</p>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
 
       <AdSlot
         enabled={adsEnabled}

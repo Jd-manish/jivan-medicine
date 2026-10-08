@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 import { DarkModeToggle } from "@/components/dark-mode-toggle";
@@ -21,6 +22,7 @@ export function SiteHeader({
   locales: readonly string[];
   ctaLabel: string;
 }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
 
   return (
@@ -36,7 +38,7 @@ export function SiteHeader({
         </Link>
 
         <div className="hidden max-w-md flex-1 lg:block">
-          <TopSearch locale={locale} placeholder="Search any medicine, salt or brand…" />
+          <TopSearch locale={locale} placeholder="Search medicine, symptom, disease, or operation…" />
         </div>
 
         <div className="flex items-center gap-2">
@@ -46,7 +48,7 @@ export function SiteHeader({
             aria-label="Language"
             defaultValue={locale}
             onChange={(e) => {
-              window.location.href = `/${e.target.value}`;
+              router.push(`/${e.target.value}`);
             }}
             className="hidden rounded-lg border border-ink-200 bg-white px-2 py-1.5 text-xs font-semibold uppercase text-ink-600 outline-none sm:block"
           >
@@ -58,7 +60,7 @@ export function SiteHeader({
           </select>
 
           <Link
-            href={`/${locale}#quote`}
+            href={`/${locale}/contact/`}
             className="hidden rounded-xl bg-ink-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-ink-800 sm:inline-flex"
           >
             {ctaLabel}
@@ -79,7 +81,7 @@ export function SiteHeader({
       </div>
 
       <div className="shell pb-3 lg:hidden">
-        <TopSearch locale={locale} placeholder="Search any medicine or salt…" />
+        <TopSearch locale={locale} placeholder="Search medicine, symptom, or operation…" />
       </div>
 
       <div className="hidden border-t border-ink-100/70 lg:block">

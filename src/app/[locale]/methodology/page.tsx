@@ -1,85 +1,67 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { isValidLocale, supportedLocales } from "@/lib/i18n";
+import { isValidLocale } from "@/lib/i18n";
+import { localizedAlternates, localizedRobots } from "@/lib/seo";
 
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   if (!isValidLocale(locale)) return {};
-
   return {
-    title: "How We Verify Medicine Prices — Jivan Methodology",
-    description:
-      "The exact process behind Jivan price entries: where anchor prices come from, how derived prices are calculated with a stated formula, what each label means, and our known limitations.",
-    alternates: {
-      canonical: `/${locale}/methodology`,
-      languages: Object.fromEntries(supportedLocales.map((alt) => [alt, `/${alt}/methodology`])),
-    },
+    title: "Medicine and Procedure Price Methodology — Jivan",
+    description: "Learn how Jivan labels medicine reference prices and derived estimates, calculates comparisons, and presents procedure price sources and limitations.",
+    alternates: localizedAlternates(locale, "methodology"),
+    robots: localizedRobots(locale),
   };
 }
 
 const steps = [
   {
     n: "1",
-    t: "Anchor collection",
-    body: "For each molecule we establish anchor prices as reference ranges, not single points: a typical US/EU retail price band for the pack described, and a typical Indian retail market price actually paid at a pharmacy — not the printed MRP on the box. Both are normalized to USD cents for comparison.",
+    t: "Medicine catalogue records",
+    body: "The static catalogue includes curated anchor rows and generated derived rows. Anchor records carry a broad public-reference-basis note, but the current medicine data does not provide an individual public citation URL or dated quotation for every row. The “market checked” label reflects the stored catalogue status; it is not proof of a current pharmacy offer or an independent certification.",
   },
   {
     n: "2",
-    t: "Labelling",
-    body: "Every entry then gets a status label that never changes silently: “Market checked” means cross-checked against documented reference ranges. “Derived” means it was computed from a same-molecule anchor using the formula below. We do not publish invented numbers marked as verified.",
+    t: "Derived catalogue estimates",
+    body: "Derived rows are produced from an anchor using preset strength and pack-size factors plus deterministic adjustment values. They are calculations, not separately observed prices, validated manufacturer products, or actual offers from a supplier. Company names in generated rows should not be read as confirmation that the named company sells that exact presentation.",
+    formula: "derived reference = anchor value × preset strength factor × preset pack factor × catalogue adjustment",
   },
   {
     n: "3",
-    t: "Derived price computation",
-    body: "Derived entries scale from their molecule's documented anchor: multiply the anchor price by the strength factor and pack-size factor of the variant, with a small deterministic range to reflect manufacturer spread. The exact anchor each entry was derived from is named on the page.",
-    formula: "derived = anchor × strengthFactor × packFactor( × manufacturerJitter )",
+    t: "Currency and comparison",
+    body: "Medicine values are stored as USD cents and displayed in USD. The catalogue does not expose a live exchange-rate timestamp or calculate an individual’s insurance, tax, import, or delivery costs. Percentages use the displayed reference values: (higher-market reference − India reference) ÷ higher-market reference × 100. Displayed savings are floored to one decimal and capped below 100% to avoid implying a free product.",
   },
   {
     n: "4",
-    t: "Indexation separation",
-    body: "Only market-checked anchors — hand-reviewed entries with unique molecule-specific content — are submitted to search engines. Derived variants remain accessible to users through search and links but are excluded from the index to keep the public corpus high-value.",
+    t: "Procedure price sources",
+    body: "Operation pages link to named publishers and describe the market, currency, and source scope supplied in the evidence record. Where a comparison uses range midpoints, the percentage is arithmetic on those published endpoints—not a guaranteed saving and not proof that two estimates include the same services.",
   },
   {
     n: "5",
-    t: "Review and correction",
-    body: "Anchors are re-reviewed on a rolling basis. Readers can report any figure that looks wrong through the contact page; verified errors are corrected promptly and visibly.",
+    t: "Static pages and index coverage",
+    body: "The static build generates medicine detail routes from an explicit slug manifest. Search can also show derived catalogue rows that do not have their own detail page; those rows are labelled as estimates and should not be treated as verified product listings. Medicine detail pages are built only for the curated primary locales (English, German, French, Spanish, and Italian).",
   },
 ];
 
-const labels = [
-  { k: "Market checked", v: "Cross-checked against documented reference ranges for the exact molecule, strength and pack shown. This is our strongest label.", c: "text-mint-600 bg-mint-500/10" },
-  { k: "Derived", v: "Computed from a named market-checked anchor of the same molecule using the scaling formula. Reliable for planning; confirm before purchase.", c: "text-royal-600 bg-royal-500/10" },
-  { k: "Estimated", v: "Therapy-class baseline where no anchor exists yet. Shown rarely, labelled clearly, and we offer a manual price-check instead of pretending confidence.", c: "text-amber-600 bg-amber-500/10" },
-];
-
 const limits = [
-  "Prices are reference points for decision-making, not live quotations; availability and final price always rest with the actual supplier.",
-  "Indian figures reflect typical retail market pricing and intentionally exclude printed MRP where MRP does not reflect what patients pay street-side.",
-  "Currency conversion uses recent observed rates and is not tick-by-tick.",
-  "Insurance, copay structure, tax and customs change what an individual actually pays; our figures are out-of-pocket reference ranges.",
-  "During active conflict, shortages or currency shocks, local prices can move faster than our re-review cycle — treat stale-seeming figures as flags to verify.",
+  "None of the displayed catalogue values is a live checkout price. Confirm current price, stock, exact strength, form, pack size, manufacturer, and legal supply with a licensed supplier.",
+  "A catalogue status label cannot replace a source URL, a dated quotation, an invoice, or a regulator’s product record. If a row lacks a public citation, treat its source trail as incomplete.",
+  "A derived row may not correspond to a product that is currently manufactured or sold. Do not use generated values for purchasing, import, or treatment decisions.",
+  "Insurance, copays, local taxes, customs, hospital fees, patient condition, and complications can materially change actual costs.",
+  "Clinical and travel information is general education. Consult a qualified clinician and the applicable regulator before making health or cross-border treatment decisions.",
 ];
 
 export default async function MethodologyPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  
 
   return (
     <>
       <section className="border-b border-ink-100 bg-white">
         <div className="shell py-12 sm:py-16">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-mint-600">Data · Methodology</p>
-          <h1 className="mt-3 max-w-3xl text-3xl font-black leading-tight text-ink-900 sm:text-4xl">
-            How we verify medicine prices
-          </h1>
+          <h1 className="mt-3 max-w-3xl text-3xl font-black leading-tight text-ink-900 sm:text-4xl">Medicine and procedure price methodology</h1>
           <p className="mt-4 max-w-2xl text-base leading-7 text-ink-600">
-            The full process behind every figure on Jivan: where anchor prices come from, how derived prices are
-            calculated, what each label means, and the limitations we will not pretend away.
+            What Jivan’s catalogue labels, generated estimates, source-linked procedure ranges, and savings calculations do—and do not—tell you.
           </p>
         </div>
       </section>
@@ -87,21 +69,15 @@ export default async function MethodologyPage({ params }: { params: Promise<{ lo
       <div className="shell grid gap-8 py-12 lg:grid-cols-[1fr_320px]">
         <div className="space-y-6">
           <section className="panel rounded-3xl p-6 sm:p-8">
-            <h2 className="text-xl font-bold text-ink-900">The five-step process</h2>
+            <h2 className="text-xl font-bold text-ink-900">How to read a comparison</h2>
             <div className="mt-5 space-y-5">
               {steps.map((step) => (
                 <div key={step.n} className="flex gap-4">
-                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-ink-900 text-sm font-black text-white">
-                    {step.n}
-                  </span>
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-ink-900 text-sm font-black text-white">{step.n}</span>
                   <div>
                     <h3 className="text-base font-bold text-ink-900">{step.t}</h3>
                     <p className="mt-1 text-sm leading-7 text-ink-600">{step.body}</p>
-                    {step.formula ? (
-                      <code className="mt-2 block rounded-xl bg-ink-900 px-4 py-3 font-mono text-sm text-mint-300">
-                        {step.formula}
-                      </code>
-                    ) : null}
+                    {step.formula ? <code className="mt-2 block overflow-x-auto rounded-xl bg-ink-900 px-4 py-3 font-mono text-xs leading-6 text-mint-300">{step.formula}</code> : null}
                   </div>
                 </div>
               ))}
@@ -109,27 +85,26 @@ export default async function MethodologyPage({ params }: { params: Promise<{ lo
           </section>
 
           <section className="panel rounded-3xl p-6 sm:p-8">
-            <h2 className="text-xl font-bold text-ink-900">What the labels mean</h2>
-            <div className="mt-4 space-y-3">
-              {labels.map((label) => (
-                <div key={label.k} className="rounded-2xl border border-ink-100 p-4">
-                  <span className={`inline-flex rounded-lg px-2.5 py-1 text-xs font-bold ${label.c}`}>{label.k}</span>
-                  <p className="mt-2 text-sm leading-7 text-ink-600">{label.v}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="panel rounded-3xl border-l-4 border-l-amber-500 p-6 sm:p-8">
             <h2 className="text-xl font-bold text-ink-900">Known limitations</h2>
             <ul className="mt-3 space-y-2.5">
               {limits.map((item) => (
                 <li key={item} className="flex gap-2.5 text-sm leading-7 text-ink-600">
-                  <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
-                  {item}
+                  <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />{item}
                 </li>
               ))}
             </ul>
+          </section>
+
+          <section className="panel rounded-3xl border-l-4 border-l-mint-500 p-6 sm:p-8">
+            <h2 className="text-xl font-bold text-ink-900">Need to verify a number?</h2>
+            <p className="mt-3 text-sm leading-7 text-ink-600">
+              For medicine prices, check with a licensed supplier using the exact product and pack. For a procedure, request written estimates from each provider and compare the included services line by line. Send Jivan a page URL and a public source if you spot a possible error.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <Link href={`/${locale}/search/`} className="btn-primary">Search the medicine catalogue</Link>
+              <Link href={`/${locale}/surgeries/`} className="rounded-xl border border-ink-200 px-4 py-2.5 text-sm font-semibold text-ink-700 hover:border-mint-500">View procedure guides</Link>
+              <Link href={`/${locale}/corrections/`} className="rounded-xl border border-ink-200 px-4 py-2.5 text-sm font-semibold text-ink-700 hover:border-mint-500">Corrections</Link>
+            </div>
           </section>
         </div>
 
@@ -138,29 +113,14 @@ export default async function MethodologyPage({ params }: { params: Promise<{ lo
             <h2 className="text-sm font-bold uppercase tracking-wide text-ink-400">Related</h2>
             <ul className="mt-3 space-y-2.5 text-sm">
               {[
-                ["Editorial policy", `/${locale}/editorial-policy`],
-                ["Report a price issue", `/${locale}/contact`],
-                ["Search the catalog", `/${locale}/search`],
-                ["About Jivan", `/${locale}/about`],
+                ["Editorial policy", `/${locale}/editorial-policy/`],
+                ["Corrections", `/${locale}/corrections/`],
+                ["About Jivan", `/${locale}/about/`],
+                ["Medical disclaimer", `/${locale}/medical-disclaimer/`],
               ].map(([label, href]) => (
-                <li key={href}>
-                  <Link href={href} className="font-semibold text-ink-700 hover:text-mint-600">
-                    {label} →
-                  </Link>
-                </li>
+                <li key={href}><Link href={href} className="font-semibold text-ink-700 hover:text-mint-600">{label} →</Link></li>
               ))}
             </ul>
-          </div>
-
-          <div className="panel rounded-3xl p-6">
-            <h2 className="text-sm font-bold text-ink-900">See a price that looks wrong?</h2>
-            <p className="mt-2 text-sm leading-6 text-ink-600">
-              Send the page URL and the correct figure (with a reference if possible) via the contact page. Verified
-              errors are corrected promptly and visibly.
-            </p>
-            <Link href={`/${locale}/contact`} className="btn-primary mt-4 w-full">
-              Report it
-            </Link>
           </div>
         </aside>
       </div>

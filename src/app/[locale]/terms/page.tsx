@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { isValidLocale, supportedLocales } from "@/lib/i18n";
+import { isValidLocale } from "@/lib/i18n";
+import { localizedAlternates, localizedRobots } from "@/lib/seo";
 
 
 export async function generateMetadata({
@@ -14,10 +15,8 @@ export async function generateMetadata({
     title: "Terms of Use",
     description:
       "Terms governing use of Jivan: the information service we provide, what we are not, intellectual property, acceptable use, accuracy limitations and liability.",
-    alternates: {
-      canonical: `/${locale}/terms`,
-      languages: Object.fromEntries(supportedLocales.map((alt) => [alt, `/${alt}/terms`])),
-    },
+    alternates: localizedAlternates(locale, "terms"),
+    robots: localizedRobots(locale),
   };
 }
 

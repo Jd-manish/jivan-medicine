@@ -2,12 +2,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { GlobeArt, MoleculeArt, ShieldArt, WalletArt } from "@/components/medical-art";
 import { isValidLocale } from "@/lib/i18n";
+import { localizedAlternates, localizedRobots } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Our mission — medicine access as a human right",
-  description:
-    "Jivan is a free, independent transparency platform helping patients in the US and Europe discover affordable same-salt medicine alternatives. We sell nothing and take no commission.",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isValidLocale(locale)) return {};
+  return {
+    title: "Our mission — medicine access as a human right",
+    description: "Jivan is a free, independent transparency platform helping patients in the US and Europe discover affordable same-salt medicine alternatives. We sell nothing and take no commission.",
+    alternates: localizedAlternates(locale, "mission"),
+    robots: localizedRobots(locale),
+  };
+}
 
 const principles = [
   {

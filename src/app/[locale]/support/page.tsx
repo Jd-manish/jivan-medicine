@@ -2,15 +2,21 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { GlobeArt, MoleculeArt, ShieldArt, WalletArt } from "@/components/medical-art";
 import { isValidLocale } from "@/lib/i18n";
+import { localizedAlternates, localizedRobots } from "@/lib/seo";
 import { P } from "@/lib/ui-panels";
 import { ui } from "@/lib/ui-core";
 import { paymentConfig, getPaymentMethods } from "@/lib/payment-config";
 
-export const metadata: Metadata = {
-  title: "Support Jivan — help keep medicine pricing free",
-  description:
-    "Jivan is a free, non-commercial medicine price transparency platform. Voluntary contributions cover server and research costs so the service stays free for every patient.",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isValidLocale(locale)) return {};
+  return {
+    title: "Support Jivan — help keep medicine pricing free",
+    description: "Jivan is a free, non-commercial medicine price transparency platform. Voluntary contributions cover server and research costs so the service stays free for every patient.",
+    alternates: localizedAlternates(locale, "support"),
+    robots: localizedRobots(locale),
+  };
+}
 
 export default async function SupportPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;

@@ -1,15 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
+
+const SUPPORT_CHANGE_EVENT = "jivan-support-change";
+
+function getHiddenSnapshot(): boolean {
+  if (typeof window === "undefined") return false;
+  return sessionStorage.getItem("jivan_support_hidden") === "1";
+}
+
+function subscribeToSupport(onChange: () => void): () => void {
+  window.addEventListener(SUPPORT_CHANGE_EVENT, onChange);
+  return () => window.removeEventListener(SUPPORT_CHANGE_EVENT, onChange);
+}
 
 export function SupportButton({ locale }: { locale: string }) {
-  // Rendered server-side so it is visible immediately and without JavaScript.
-  const [hidden, setHidden] = useState(false);
-
-  useEffect(() => {
-    if (sessionStorage.getItem("jivan_support_hidden") === "1") setHidden(true);
-  }, []);
+  const hidden = useSyncExternalStore(subscribeToSupport, getHiddenSnapshot, () => false);
 
   if (hidden) return null;
 
@@ -26,15 +33,13 @@ export function SupportButton({ locale }: { locale: string }) {
             <path d="M12 21s-7.5-4.7-9.6-9A5.3 5.3 0 0 1 12 6.2 5.3 5.3 0 0 1 21.6 12c-2.1 4.3-9.6 9-9.6 9Z" />
           </svg>
         </span>
-        <span className="text-xs font-bold leading-tight">
-          Help the admin
-        </span>
+        <span className="text-xs font-bold leading-tight">Help the admin</span>
       </Link>
 
       <button
         onClick={() => {
           sessionStorage.setItem("jivan_support_hidden", "1");
-          setHidden(true);
+          window.dispatchEvent(new Event(SUPPORT_CHANGE_EVENT));
         }}
         aria-label="Hide support button"
         className="grid h-6 w-6 place-items-center rounded-full bg-white text-[11px] font-bold text-ink-400 shadow ring-1 ring-ink-100 hover:text-ink-900"

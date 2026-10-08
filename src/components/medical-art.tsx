@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useId, type CSSProperties } from "react";
 
 type ArtProps = {
   className?: string;
@@ -6,21 +6,22 @@ type ArtProps = {
 };
 
 export function CapsuleArt({ className = "", style }: ArtProps) {
+  const idPrefix = useId().replace(/:/g, "");
   return (
     <svg viewBox="0 0 120 60" className={className} style={style} aria-hidden="true">
       <defs>
-        <linearGradient id="capA" x1="0" x2="1">
+        <linearGradient id={`${idPrefix}-capA`} x1="0" x2="1">
           <stop offset="0%" stopColor="#6ee7c7" />
           <stop offset="100%" stopColor="#12b98c" />
         </linearGradient>
-        <linearGradient id="capB" x1="0" x2="1">
+        <linearGradient id={`${idPrefix}-capB`} x1="0" x2="1">
           <stop offset="0%" stopColor="#eef4ff" />
           <stop offset="100%" stopColor="#c3d7ff" />
         </linearGradient>
       </defs>
       <g transform="rotate(-18 60 30)">
-        <path d="M32 8h28v44H32a22 22 0 0 1 0-44Z" fill="url(#capA)" />
-        <path d="M60 8h28a22 22 0 0 1 0 44H60V8Z" fill="url(#capB)" />
+        <path d="M32 8h28v44H32a22 22 0 0 1 0-44Z" fill={`url(#${idPrefix}-capA)`} />
+        <path d="M60 8h28a22 22 0 0 1 0 44H60V8Z" fill={`url(#${idPrefix}-capB)`} />
         <ellipse cx="46" cy="20" rx="7" ry="4" fill="#ffffff" opacity="0.45" />
       </g>
     </svg>
@@ -28,16 +29,17 @@ export function CapsuleArt({ className = "", style }: ArtProps) {
 }
 
 export function TabletArt({ className = "", style }: ArtProps) {
+  const idPrefix = useId().replace(/:/g, "");
   return (
     <svg viewBox="0 0 80 80" className={className} style={style} aria-hidden="true">
       <defs>
-        <radialGradient id="tabG" cx="35%" cy="30%">
+        <radialGradient id={`${idPrefix}-tabG`} cx="35%" cy="30%">
           <stop offset="0%" stopColor="#ffffff" />
           <stop offset="55%" stopColor="#dbe7ff" />
           <stop offset="100%" stopColor="#9db9ef" />
         </radialGradient>
       </defs>
-      <circle cx="40" cy="40" r="32" fill="url(#tabG)" />
+      <circle cx="40" cy="40" r="32" fill={`url(#${idPrefix}-tabG)`} />
       <path d="M18 40h44" stroke="#6b86bd" strokeWidth="3" strokeLinecap="round" opacity="0.7" />
       <ellipse cx="30" cy="27" rx="9" ry="5" fill="#ffffff" opacity="0.7" />
     </svg>
@@ -45,21 +47,22 @@ export function TabletArt({ className = "", style }: ArtProps) {
 }
 
 export function SyringeArt({ className = "", style }: ArtProps) {
+  const idPrefix = useId().replace(/:/g, "");
   return (
     <svg viewBox="0 0 140 70" className={className} style={style} aria-hidden="true">
       <defs>
-        <linearGradient id="syrBody" x1="0" x2="1">
+        <linearGradient id={`${idPrefix}-syrBody`} x1="0" x2="1">
           <stop offset="0%" stopColor="#f4f8ff" />
           <stop offset="100%" stopColor="#cfe0fb" />
         </linearGradient>
-        <linearGradient id="syrFluid" x1="0" x2="1">
+        <linearGradient id={`${idPrefix}-syrFluid`} x1="0" x2="1">
           <stop offset="0%" stopColor="#34d3aa" />
           <stop offset="100%" stopColor="#12b98c" />
         </linearGradient>
       </defs>
       <g transform="rotate(-24 70 35)">
-        <rect x="26" y="24" width="66" height="22" rx="7" fill="url(#syrBody)" stroke="#a9c1e8" strokeWidth="1.5" />
-        <rect x="30" y="28" width="38" height="14" rx="5" fill="url(#syrFluid)" />
+        <rect x="26" y="24" width="66" height="22" rx="7" fill={`url(#${idPrefix}-syrBody)`} stroke="#a9c1e8" strokeWidth="1.5" />
+        <rect x="30" y="28" width="38" height="14" rx="5" fill={`url(#${idPrefix}-syrFluid)`} />
         <rect x="12" y="28" width="16" height="14" rx="4" fill="#b9cdee" />
         <rect x="4" y="24" width="10" height="22" rx="3" fill="#8fa8d4" />
         <rect x="92" y="31" width="14" height="8" rx="3" fill="#9db9ef" />
@@ -70,16 +73,17 @@ export function SyringeArt({ className = "", style }: ArtProps) {
 }
 
 export function VialArt({ className = "", style }: ArtProps) {
+  const idPrefix = useId().replace(/:/g, "");
   return (
     <svg viewBox="0 0 60 100" className={className} style={style} aria-hidden="true">
       <defs>
-        <linearGradient id="vialG" x1="0" x2="0" y1="0" y2="1">
+        <linearGradient id={`${idPrefix}-vialG`} x1="0" x2="0" y1="0" y2="1">
           <stop offset="0%" stopColor="#eaf3ff" />
           <stop offset="100%" stopColor="#bcd4f7" />
         </linearGradient>
       </defs>
       <rect x="16" y="6" width="28" height="10" rx="3" fill="#7f96c4" />
-      <rect x="12" y="16" width="36" height="76" rx="12" fill="url(#vialG)" stroke="#a9c1e8" strokeWidth="1.5" />
+      <rect x="12" y="16" width="36" height="76" rx="12" fill={`url(#${idPrefix}-vialG)`} stroke="#a9c1e8" strokeWidth="1.5" />
       <rect x="16" y="46" width="28" height="42" rx="9" fill="#34d3aa" opacity="0.85" />
       <circle cx="24" cy="60" r="4" fill="#ffffff" opacity="0.5" />
     </svg>

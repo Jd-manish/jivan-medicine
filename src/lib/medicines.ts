@@ -290,7 +290,7 @@ export type CatalogParams = {
 
 export async function getMedicineCatalog(params: CatalogParams = {}) {
   const page = Math.max(1, params.page ?? 1);
-  const pageSize = Math.min(60, Math.max(1, params.pageSize ?? 24));
+  const pageSize = Math.min(500, Math.max(1, params.pageSize ?? 24));
   let rows = getAll();
 
   const search = params.search?.trim().toLowerCase() ?? "";

@@ -27,6 +27,10 @@ export const supportedLocales = [
 
 export type AppLocale = (typeof supportedLocales)[number];
 
+/** Curated locales with maintained translations and indexable editorial copy. */
+export const primaryLocales = ["en", "de", "fr", "es", "it"] as const satisfies readonly AppLocale[];
+export type PrimaryLocale = (typeof primaryLocales)[number];
+
 export const defaultLocale: AppLocale = "en";
 
 export function isValidLocale(value: string): value is AppLocale {
@@ -167,7 +171,7 @@ const en: TranslationSet = {
   why2: "Lower production and distribution costs",
   why3: "Competitive multi-supplier medicine ecosystem",
   searchTitle: "Search medicines, injections, life-saving drugs, and medical equipment",
-  searchPlaceholder: "Search by medicine, salt, strength, company, or use case",
+  searchPlaceholder: "Search medicine, symptom, disease, drug class, or procedure",
   allCategories: "All categories",
   tableMedicine: "Medicine",
   tableCategory: "Category",

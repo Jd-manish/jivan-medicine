@@ -1,18 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
  * Animated counter that counts from 0 to `end` when scrolled into view.
  * Uses IntersectionObserver for performance — no scroll listeners.
- *
- * Props:
- *  - end: target number
- *  - duration: animation duration in ms (default 2000)
- *  - prefix: string before number (e.g. "$")
- *  - suffix: string after number (e.g. "%", "×")
- *  - decimals: decimal places (default 0)
- *  - className: additional classes
  */
 export function AnimatedCounter({
   end,
@@ -33,25 +25,7 @@ export function AnimatedCounter({
   const [hasAnimated, setHasAnimated] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting && !hasAnimated) {
-          setHasAnimated(true);
-          animateCount(0, end, duration);
-        }
-      },
-      { threshold: 0.3 }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [end, duration, hasAnimated]);
-
-  function animateCount(start: number, target: number, ms: number) {
+  const animateCount = useCallback((start: number, target: number, ms: number) => {
     const startTime = performance.now();
     const easeOutExpo = (t: number) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
 
@@ -64,7 +38,25 @@ export function AnimatedCounter({
     }
 
     requestAnimationFrame(tick);
-  }
+  }, []);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && !hasAnimated) {
+          setHasAnimated(true);
+          animateCount(0, end, duration);
+        }
+      },
+      { threshold: 0.3 },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [animateCount, duration, end, hasAnimated]);
 
   const formatted = decimals > 0 ? current.toFixed(decimals) : Math.round(current).toLocaleString("en-US");
 
@@ -75,10 +67,7 @@ export function AnimatedCounter({
   );
 }
 
-/**
- * Animated counter specifically for dollar amounts.
- * Shows "$" prefix, 0 decimals, with comma formatting.
- */
+/** Animated counter specifically for dollar amounts. */
 export function DollarCounter({
   end,
   duration = 2000,
@@ -88,20 +77,10 @@ export function DollarCounter({
   duration?: number;
   className?: string;
 }) {
-  return (
-    <AnimatedCounter
-      end={end}
-      duration={duration}
-      prefix="$"
-      className={className}
-    />
-  );
+  return <AnimatedCounter end={end} duration={duration} prefix="$" className={className} />;
 }
 
-/**
- * Animated percentage counter.
- * Shows "%" suffix with 1 decimal place.
- */
+/** Animated percentage counter with one decimal place. */
 export function PercentCounter({
   end,
   duration = 2000,
@@ -111,13 +90,5 @@ export function PercentCounter({
   duration?: number;
   className?: string;
 }) {
-  return (
-    <AnimatedCounter
-      end={end}
-      duration={duration}
-      suffix="%"
-      decimals={1}
-      className={className}
-    />
-  );
+  return <AnimatedCounter end={end} duration={duration} suffix="%" decimals={1} className={className} />;
 }
