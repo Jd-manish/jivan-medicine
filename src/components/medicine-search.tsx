@@ -110,7 +110,7 @@ function MedicineSearchCard({
 
   return (
     <article className={`panel panel-hover anim-rise relative overflow-hidden rounded-3xl p-5 delay-${Math.min(index % 4 + 1, 4)}`}>
-      <div className="absolute right-4 top-4 rounded-xl bg-gradient-to-br from-mint-400 to-mint-600 px-2.5 py-1 text-xs font-bold text-white shadow-md shadow-mint-500/30">
+      <div className="absolute right-4 top-4 rounded-xl bg-gradient-to-br from-mint-300 to-mint-500 px-2.5 py-1 text-xs font-bold text-[#04150f] shadow-md shadow-mint-500/30">
         {badge}
       </div>
       <span className={`inline-flex rounded-lg px-2.5 py-1 text-[11px] font-semibold ${categoryAccent[item.category] ?? "bg-ink-100 text-ink-600"}`}>

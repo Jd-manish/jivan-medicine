@@ -10,6 +10,7 @@
     "start": "npx serve out",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "check:contrast": "node scripts/scan-contrast.mjs",
     "check": "npm run lint && npm run typecheck && npm run build",
     "deploy:preview": "npm run build && npx wrangler pages deploy out --project-name jivan-medicine --branch arena/9d76890b-jivan-medicine"
   },

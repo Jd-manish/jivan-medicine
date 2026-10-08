@@ -9,7 +9,7 @@ export default function NotFound() {
       <CapsuleArt className="anim-float absolute -left-8 bottom-12 w-40 opacity-20" />
 
       <section className="relative max-w-xl">
-        <div className="inline-flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-mint-400 to-mint-600 text-4xl font-black text-ink-900">
+        <div className="inline-flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-mint-300 to-mint-500 text-4xl font-black text-[#04150f]">
           404
         </div>
 

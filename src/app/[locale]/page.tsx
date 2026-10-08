@@ -377,7 +377,7 @@ export default async function LocalizedHomePage({
                       <h3 className="truncate text-base font-bold text-white group-hover:text-mint-300">{item.genericSalt}</h3>
                       <p className="mt-1 truncate text-xs text-ink-400">{item.brandNames || item.name}</p>
                     </div>
-                    <span className="shrink-0 rounded-xl bg-mint-500 px-2.5 py-1 text-xs font-black text-ink-900">
+                    <span className="shrink-0 rounded-xl bg-mint-500 px-2.5 py-1 text-xs font-black text-[#04150f]">
                       {multiple}×
                     </span>
                   </div>

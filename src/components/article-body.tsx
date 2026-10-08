@@ -93,7 +93,7 @@ export function ArticleBody({ sections }: { sections: ArticleSection[] }) {
                     </tbody>
                   </table>
                 </div>
-                <figcaption className="border-t border-ink-100 bg-white px-4 py-2.5 text-xs text-ink-400">
+                <figcaption className="border-t border-ink-100 bg-white px-4 py-2.5 text-xs text-ink-500">
                   {section.table.caption}
                 </figcaption>
               </figure>

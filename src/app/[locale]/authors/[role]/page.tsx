@@ -55,7 +55,7 @@ export default async function AuthorPage({ params }: { params: Promise<PageParam
           </nav>
 
           <div className="mt-6 flex items-start gap-5">
-            <div className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-mint-400 to-mint-600 text-2xl font-black text-white" aria-hidden="true">
+            <div className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-mint-300 to-mint-500 text-2xl font-black text-[#04150f]" aria-hidden="true">
               {editorialRole.title.split(" ").map((word) => word[0]).slice(0, 2).join("")}
             </div>
             <div>
