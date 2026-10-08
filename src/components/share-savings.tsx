@@ -123,7 +123,7 @@ export function ShareSavings({
           onClick={copyToClipboard}
           className={`inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-xs font-bold transition hover:scale-[1.03] ${
             copied
-              ? "bg-mint-500 text-white"
+              ? "bg-mint-500 text-[#04150f]"
               : "bg-ink-50 text-ink-700 hover:bg-ink-100"
           }`}
         >

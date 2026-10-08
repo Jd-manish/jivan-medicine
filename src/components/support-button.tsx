@@ -24,7 +24,7 @@ export function SupportButton({ locale }: { locale: string }) {
     <div className="fixed bottom-24 right-3 z-40 flex items-center gap-1.5 md:bottom-6 md:right-6">
       <Link
         href={`/${locale}/support`}
-        className="group flex items-center gap-2 rounded-full bg-gradient-to-br from-mint-500 to-mint-600 py-2.5 pl-3 pr-4 text-white shadow-lg shadow-mint-600/30 transition hover:scale-[1.03] hover:shadow-xl"
+        className="group flex items-center gap-2 rounded-full bg-gradient-to-br from-mint-300 to-mint-500 py-2.5 pl-3 pr-4 text-[#04150f] shadow-lg shadow-mint-500/30 transition hover:scale-[1.03] hover:shadow-xl"
         aria-label="Help the admin keep Jivan free"
       >
         <span className="relative grid h-6 w-6 place-items-center">
@@ -42,7 +42,7 @@ export function SupportButton({ locale }: { locale: string }) {
           window.dispatchEvent(new Event(SUPPORT_CHANGE_EVENT));
         }}
         aria-label="Hide support button"
-        className="grid h-6 w-6 place-items-center rounded-full bg-white text-[11px] font-bold text-ink-400 shadow ring-1 ring-ink-100 hover:text-ink-900"
+        className="grid h-6 w-6 place-items-center rounded-full bg-white text-[11px] font-bold text-ink-600 shadow ring-1 ring-ink-100 hover:text-ink-900"
       >
         ×
       </button>

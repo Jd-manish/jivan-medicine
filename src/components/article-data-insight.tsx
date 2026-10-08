@@ -53,7 +53,7 @@ export function ArticleDataInsight({
         <div className="mt-5 flex flex-wrap items-center gap-3">
           <Link
             href={searchHref}
-            className="rounded-xl bg-mint-500 px-4 py-2.5 text-sm font-bold text-ink-900 transition hover:bg-mint-400"
+            className="rounded-xl bg-mint-500 px-4 py-2.5 text-sm font-bold text-[#04150f] transition hover:bg-mint-400"
           >
             Explore this data in the catalog →
           </Link>

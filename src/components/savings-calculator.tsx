@@ -83,8 +83,8 @@ export function SavingsCalculator({ locale }: { locale: string }) {
           <p className="text-xs font-medium text-ink-400">{ui(locale, P.calcSavedMonthly)}</p>
           <p className="mt-1 text-xl font-semibold text-mint-600">{fmt.format(monthlySaved)}</p>
         </div>
-        <div className="rounded-2xl bg-gradient-to-br from-mint-500 to-mint-600 p-4 text-white">
-          <p className="text-xs font-medium text-white/80">{ui(locale, P.calcSavedYearly)}</p>
+        <div className="rounded-2xl bg-gradient-to-br from-mint-300 to-mint-500 p-4 text-[#04150f]">
+          <p className="text-xs font-medium text-[#04150f]/80">{ui(locale, P.calcSavedYearly)}</p>
           <p className="mt-1 text-xl font-semibold">{fmt.format(yearlySaved)}</p>
         </div>
       </div>

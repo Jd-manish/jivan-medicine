@@ -103,7 +103,7 @@ export function PriceShockCard({
                 )}
               </div>
               <div className="text-right">
-                <span className="rounded-xl bg-mint-500 px-3 py-1.5 text-lg font-black text-ink-900">
+                <span className="rounded-xl bg-mint-500 px-3 py-1.5 text-lg font-black text-[#04150f]">
                   {multiple}×
                 </span>
                 <p className="mt-1 text-xs font-semibold text-mint-300">

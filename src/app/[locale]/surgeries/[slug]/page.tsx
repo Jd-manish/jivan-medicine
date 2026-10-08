@@ -256,7 +256,7 @@ export default async function SurgeryDetailPage({
                   href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`${surgery.name}: ${formatPrice(surgery.prices.india)} in India vs ${formatPrice(surgery.prices.us)} in the US; ${Math.abs(savings)}% ${savings >= 0 ? "lower" : "higher"} using ${comparisonBasis.toLowerCase()} (arithmetic only, not like-for-like). ${SITE_URL}/${locale}/surgeries/${surgery.slug}/`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-xl bg-green-600 px-3 py-2 text-xs font-semibold text-white hover:bg-green-700"
+                  className="rounded-xl bg-green-700 px-3 py-2 text-xs font-semibold text-white hover:bg-green-800"
                 >
                   WhatsApp
                 </a>
