@@ -8,7 +8,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SupportButton } from "@/components/support-button";
 import { BackToTop } from "@/components/back-to-top";
 import { isValidLocale, supportedLocales, t } from "@/lib/i18n";
-import { localizedRobots } from "@/lib/seo";
+import { localizedRobots, TRANSLATED_UI_LOCALES } from "@/lib/seo";
 
 // Fully static — no DB, no server runtime needed.
 
@@ -86,7 +86,9 @@ export default async function LocaleLayout({
           <div>
             <h4 className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-400">Platform</h4>
             <ul className="mt-3 space-y-2 text-sm text-ink-600">
-              <li><Link className="hover:text-mint-600" href={`/${locale}#catalog`}>{copy.navMedicines}</Link></li>
+              <li><Link className="hover:text-mint-600" href={`/${locale}/search`}>{copy.navMedicines}</Link></li>
+              <li><Link className="hover:text-mint-600" href={`/${locale}/medicines`}>All medicines A–Z</Link></li>
+              <li><Link className="hover:text-mint-600" href={`/${locale}/surgeries`}>Surgeries &amp; procedures</Link></li>
               <li><Link className="hover:text-mint-600" href={`/${locale}#savings`}>Savings estimator</Link></li>
               <li><Link className="hover:text-mint-600" href={`/${locale}/articles`}>{copy.navArticles}</Link></li>
               <li><Link className="hover:text-mint-600" href={`/${locale}/support`}>Support us</Link></li>
@@ -109,17 +111,27 @@ export default async function LocaleLayout({
 
           <div>
             <h4 className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-400">Languages</h4>
+            {/*
+              Only the translated-UI locales are linked from every page. The
+              remaining locales are English fallbacks kept out of the index, so
+              they are reachable from the language chooser at "/" (and the
+              header switcher) rather than from thousands of footer links.
+            */}
             <div className="mt-3 flex flex-wrap gap-1.5">
-              {supportedLocales.map((code) => (
+              {TRANSLATED_UI_LOCALES.map((code) => (
                 <Link
                   key={code}
                   href={`/${code}`}
+                  hrefLang={code}
                   className="rounded-lg bg-ink-50 px-2 py-1 text-[11px] font-semibold uppercase text-ink-600 transition hover:bg-mint-500/10 hover:text-mint-600"
                 >
                   {code}
                 </Link>
               ))}
             </div>
+            <Link href="/" className="mt-3 inline-block text-xs font-semibold text-ink-600 hover:text-mint-600">
+              All {supportedLocales.length} languages →
+            </Link>
           </div>
         </div>
 

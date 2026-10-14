@@ -1,13 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { SITE_URL } from "@/lib/seo";
+
+const SITE_HOST = SITE_URL.replace(/^https?:\/\//, "");
 
 /**
  * Social share buttons for medicine savings.
  * Pre-fills viral text showing the price difference.
  *
  * Example: "I found Sofosbuvir for $30 in India — it costs $18,000 in the US!
- * That's 99.8% less. Same active ingredient. Check your medicines: jivan.health"
+ * That's 99.8% less. Same active ingredient. Check your medicines: jivanrx.online"
  */
 export function ShareSavings({
   medicineName,
@@ -32,7 +35,7 @@ export function ShareSavings({
   const viralText =
     `💊 I found ${medicineName} for ${indiaPrice} in India — it costs ${usPrice} in the US/EU! ` +
     `That's ${savingsText} less. Same active ingredient, same quality. ` +
-    `Check your medicines at jivan.health`;
+    `Check your medicines at ${SITE_HOST}`;
 
   const encodedText = encodeURIComponent(viralText);
   const encodedUrl = encodeURIComponent(shareUrl);
@@ -160,7 +163,7 @@ export function QuickShareButton({
   const shareText =
     `💊 ${medicineName}: ${indiaPrice} in India vs ${usPrice} in US/EU ` +
     `(${savingsPercent}% less). Same medicine, same quality. ` +
-    `Check yours: jivan.health`;
+    `Check yours: ${SITE_HOST}`;
 
   async function handleShare() {
     const url = typeof window !== "undefined" ? window.location.href : "";
