@@ -344,8 +344,61 @@ export async function getMedicineCatalog(params: CatalogParams = {}) {
   };
 }
 
+/**
+ * Fields the interactive catalog actually renders. Server pages pass this
+ * projection as `initialData` instead of full `Medicine` records so the
+ * long narrative strings (description, dosage, pros, cons, side effects)
+ * are not serialized into the HTML of the home and search pages.
+ */
+export type CatalogRow = Pick<
+  Medicine,
+  | "id" | "slug" | "name" | "brandNames" | "category" | "therapyArea" | "form" | "company"
+  | "genericSalt" | "strength" | "packSize" | "useCases" | "usEuPrice" | "indiaPrice"
+  | "priceStatus" | "priceNotes" | "prescriptionRequired" | "highSaving"
+>;
+
+export function toCatalogRow(m: Medicine): CatalogRow {
+  return {
+    id: m.id, slug: m.slug, name: m.name, brandNames: m.brandNames, category: m.category,
+    therapyArea: m.therapyArea, form: m.form, company: m.company, genericSalt: m.genericSalt,
+    strength: m.strength, packSize: m.packSize, useCases: m.useCases, usEuPrice: m.usEuPrice,
+    indiaPrice: m.indiaPrice, priceStatus: m.priceStatus, priceNotes: m.priceNotes,
+    prescriptionRequired: m.prescriptionRequired, highSaving: m.highSaving,
+  };
+}
+
+/** Catalog page sized for first paint; the client fetches the full JSON on demand. */
+export async function getInitialCatalog(pageSize = 48) {
+  const result = await getMedicineCatalog({ page: 1, pageSize, sort: "savings" });
+  return { ...result, rows: result.rows.map(toCatalogRow) };
+}
+
 export async function getMedicineBySlug(slug: string): Promise<Medicine | undefined> {
   return getAll().find((m) => m.slug === slug);
+}
+
+function savingsRatio(m: Medicine) {
+  return m.usEuPrice / Math.max(m.indiaPrice, 1);
+}
+
+/** Every hand-researched (indexable) medicine, highest saving first. */
+export async function getVerifiedMedicines(): Promise<Medicine[]> {
+  return getAll()
+    .filter((m) => m.priceStatus === "market_checked")
+    .sort((a, b) => savingsRatio(b) - savingsRatio(a));
+}
+
+/**
+ * Deterministic cross-links between detail pages: other researched medicines
+ * in the same therapy area, highest saving first, topped up from the rest of
+ * the catalog so every page links onward to at least `limit` siblings.
+ */
+export async function getRelatedVerifiedMedicines(medicine: Medicine, limit = 8): Promise<Medicine[]> {
+  const verified = (await getVerifiedMedicines()).filter((m) => m.id !== medicine.id);
+  const sameArea = verified.filter((m) => m.therapyArea === medicine.therapyArea);
+  const sameAreaIds = new Set(sameArea.map((m) => m.id));
+  const filler = verified.filter((m) => !sameAreaIds.has(m.id));
+  return [...sameArea, ...filler].slice(0, limit);
 }
 
 export async function getAlternatives(salt: string, excludeId: number, limit = 8) {

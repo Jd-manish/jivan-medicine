@@ -114,17 +114,25 @@ export function SiteHeader({
                 {item.label}
               </Link>
             ))}
-            <div className="flex flex-wrap gap-1.5 pt-2">
-              {locales.slice(0, 12).map((code) => (
+            <div className="flex flex-wrap items-center gap-1.5 pt-2">
+              {locales.slice(0, 5).map((code) => (
                 <Link
                   key={code}
                   href={`/${code}`}
+                  hrefLang={code}
                   onClick={() => setOpen(false)}
                   className="rounded-lg bg-ink-50 px-2.5 py-1.5 text-[11px] font-semibold uppercase text-ink-600"
                 >
                   {code}
                 </Link>
               ))}
+              <Link
+                href="/"
+                onClick={() => setOpen(false)}
+                className="rounded-lg px-2.5 py-1.5 text-[11px] font-semibold text-ink-600 underline underline-offset-2"
+              >
+                All languages
+              </Link>
             </div>
           </div>
         </div>

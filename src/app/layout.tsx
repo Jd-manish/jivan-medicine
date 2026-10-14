@@ -1,8 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import { GOOGLE_SITE_VERIFICATION, SITE_URL } from "@/lib/seo";
 import "./globals.css";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://jivanrx.online";
+const siteUrl = SITE_URL;
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -49,11 +50,13 @@ export const metadata: Metadata = {
     url: siteUrl,
     siteName: "Jivan",
     locale: "en_US",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Jivan — Compare Medicine Prices & Indian Generic Alternatives" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Jivan — Medicine Access for Everyone",
     description: "Compare medicine prices and find lower-cost Indian same-salt alternatives.",
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
@@ -66,9 +69,7 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
-  verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
-  },
+  verification: GOOGLE_SITE_VERIFICATION ? { google: GOOGLE_SITE_VERIFICATION } : undefined,
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

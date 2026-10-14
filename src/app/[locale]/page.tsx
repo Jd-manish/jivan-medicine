@@ -24,8 +24,8 @@ import { TopSearch } from "@/components/top-search";
 import { articles } from "@/lib/articles";
 import {
   ensureMedicineSeeded,
+  getInitialCatalog,
   getInventoryStats,
-  getMedicineCatalog,
   getTopSavings,
   medicineCategories,
 } from "@/lib/medicines";
@@ -59,13 +59,13 @@ export async function generateMetadata({
       url: `/${locale}`,
       type: "website",
       siteName: "Jivan",
-      images: [{ url: "/og-image.svg", width: 1200, height: 630, alt: "Jivan — Compare Medicine Prices & Indian Generic Alternatives" }],
+      images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Jivan — Compare Medicine Prices & Indian Generic Alternatives" }],
     },
     twitter: {
       card: "summary_large_image",
       title: "Jivan — Compare Medicine Prices & Indian Generic Alternatives",
       description: copy.heroSubtitle,
-      images: ["/og-image.svg"],
+      images: ["/og-image.png"],
     },
   };
 }
@@ -113,7 +113,7 @@ export default async function LocalizedHomePage({
 
   await ensureMedicineSeeded();
   const [initialCatalog, topSavings, stats] = await Promise.all([
-    getMedicineCatalog({ page: 1, pageSize: 180 }),
+    getInitialCatalog(48),
     getTopSavings(6),
     getInventoryStats(),
   ]);
@@ -240,7 +240,7 @@ export default async function LocalizedHomePage({
                 </p>
               </div>
               <Link
-                href={`/${locale}/search?q=`}
+                href={`/${locale}/medicines`}
                 className="btn-ghost hidden sm:inline-flex"
               >
                 View all →
@@ -399,9 +399,12 @@ export default async function LocalizedHomePage({
             })}
           </div>
 
-          <div className="mt-8">
-            <Link href={`/${locale}/search?q=`} className="btn-ghost">
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link href={`/${locale}/medicines`} className="btn-ghost">
               {ui(locale, U.gapsCta)} →
+            </Link>
+            <Link href={`/${locale}/search`} className="btn-ghost">
+              Search the catalog →
             </Link>
           </div>
         </div>

@@ -13,7 +13,7 @@ This repository is designed for a fully static Cloudflare Pages deployment. GitH
    - **Build output directory:** `out`
    - **Root directory:** `/`
    - **Environment:** Node.js 22 (the repository's `.nvmrc` selects 22; if the dashboard overrides it, set `NODE_VERSION=22`)
-4. Add `NEXT_PUBLIC_SITE_URL=https://jivanrx.online` as a build-time variable. Add `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` only if Google Search Console verification is being used.
+4. Add `NEXT_PUBLIC_SITE_URL=https://jivanrx.online` as a build-time variable. Add `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` only if you verify Search Console with the HTML-tag method (the DNS method in `SEO-INDEXING.md` needs no variable).
 5. Save and run the first deployment. In **Custom domains**, attach `jivanrx.online` and any desired `www` hostname, then configure the DNS records Cloudflare provides.
 
 Cloudflare Pages creates preview deployments for non-production branches and deploys production when changes reach `main`. Review and merge a pull request before publishing production changes.
@@ -22,10 +22,10 @@ Cloudflare Pages creates preview deployments for non-production branches and dep
 
 `npm run build` runs these checks and generation steps in order:
 
-1. `npm run prepare:static` — validates the procedure/article inventory, generates the medicine slug manifest and Cloudflare redirects, and checks the `migrane` → `migraine` search regression.
-2. `npm run build:sitemap` — writes the unique 2,036-URL sitemap.
+1. `npm run prepare:static` — validates the procedure/article inventory, generates the medicine slug manifest, Cloudflare redirects and `robots.txt`, and checks the `migrane` → `migraine` search regression.
+2. `npm run build:sitemap` — writes the sitemap index `public/sitemap.xml` and the per-section child sitemaps in `public/sitemaps/` (pages, articles, procedures, medicines) for the indexable locales.
 3. `next build` — exports the site as static HTML into `out/`.
-4. `npm run validate:static` — verifies every sitemap URL has a generated HTML file, one matching canonical, all expected hreflang alternates, and exactly one H1.
+4. `npm run validate:static` — verifies every sitemap URL has a generated HTML file, one matching canonical, no `noindex`, the expected hreflang policy, a title/description and exactly one H1, and that non-indexable locales render `noindex`.
 
 No database or server process is needed at request time. Do not set the output directory to `.next`; Cloudflare must publish `out`.
 

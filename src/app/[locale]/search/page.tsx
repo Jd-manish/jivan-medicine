@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { MedicineSearch } from "@/components/medicine-search";
-import { ensureMedicineSeeded, getMedicineCatalog, medicineCategories } from "@/lib/medicines";
+import Link from "next/link";
+import { ensureMedicineSeeded, getInitialCatalog, getVerifiedMedicines, medicineCategories } from "@/lib/medicines";
 import { localizedAlternates, localizedRobots } from "@/lib/seo";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -16,7 +17,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function SearchPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   await ensureMedicineSeeded();
-  const initialData = await getMedicineCatalog({ page: 1, pageSize: 180, sort: "savings" });
+  const initialData = await getInitialCatalog(48);
+  const verifiedCount = (await getVerifiedMedicines()).length;
   const categories = medicineCategories.filter((c) => c !== "All");
 
   return (
@@ -25,6 +27,11 @@ export default async function SearchPage({ params }: { params: Promise<{ locale:
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-mint-600">Search Jivan</p>
         <h1 className="mt-2 text-3xl font-black tracking-tight text-ink-900 sm:text-4xl">Search medicines, diseases, symptoms, drug classes and operations</h1>
         <p className="mt-3 text-sm leading-6 text-ink-600">Find source-linked Indian medicine alternatives and compare operation or procedure cost guides. Search accepts common misspellings and suggests a correction when available.</p>
+        <p className="mt-3 text-sm">
+          <Link href={`/${locale}/medicines`} className="font-semibold text-mint-600 underline-offset-4 hover:underline">
+            Browse all {verifiedCount} researched medicines A–Z by therapy area →
+          </Link>
+        </p>
       </header>
       <MedicineSearch
         initialData={initialData}

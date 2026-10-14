@@ -5,9 +5,9 @@ import { formatUsd, PriceCompare, PriceStatusBadge, savingsPercent } from "@/com
 import { ShareSavings, QuickShareButton } from "@/components/share-savings";
 import { isValidLocale, primaryLocales, t } from "@/lib/i18n";
 import { P } from "@/lib/ui-panels";
-import { localizedAlternates, SITE_URL } from "@/lib/seo";
+import { isSeoLocale, localizedAlternates, localizedRobots, SITE_URL } from "@/lib/seo";
 import { ui } from "@/lib/ui-core";
-import { ensureMedicineSeeded, getAlternatives, getMedicineBySlug } from "@/lib/medicines";
+import { ensureMedicineSeeded, getAlternatives, getMedicineBySlug, getRelatedVerifiedMedicines } from "@/lib/medicines";
 import medicineSlugManifest from "@/lib/medicine-slug-manifest.json";
 
 const medicineDetailSlugs = new Set(medicineSlugManifest.generatedMedicineSlugs);
@@ -40,32 +40,30 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
    * Search-quality control, two layers:
    * 1) Only hand-researched anchor entries are indexable. Derived variants
    *    are excluded to prevent the mass-produced thin/duplicate signal.
-   * 2) Indexation only in curated locales — secondary locales share the same
-   *    English content and would appear as 24-way duplicate medicine pages.
+   * 2) Indexation only in locales listed in INDEXABLE_LOCALES (see lib/seo):
+   *    other locales share the same English content and would appear as
+   *    duplicate medicine pages.
    */
   const isResearchAnchor = medicine.priceStatus === "market_checked";
-  const isCuratedLocale = (primaryLocales as readonly string[]).includes(locale);
-  const indexable = isResearchAnchor && isCuratedLocale;
+  const indexable = isResearchAnchor && isSeoLocale(locale);
 
   return {
     title: `${medicine.name} — Indian alternative price, uses and dosage`,
     description: `${medicine.name} (${medicine.genericSalt}) costs ${formatUsd(medicine.usEuPrice, "en")} in the US/EU versus ${formatUsd(medicine.indiaPrice, "en")} in India — about ${savings}% lower. Uses, dosage, side effects and manufacturer details.`,
     alternates: localizedAlternates(locale, `medicine/${slug}`),
-    robots: indexable
-      ? { index: true, follow: true, googleBot: { index: true, follow: true, "max-snippet": -1 } }
-      : { index: false, follow: true },
+    robots: indexable ? localizedRobots(locale) : { index: false, follow: true },
     openGraph: {
       title: `${medicine.name} — ${savings}% cheaper in India | Jivan`,
       description: `Compare ${medicine.name} (${medicine.genericSalt}) prices: ${formatUsd(medicine.usEuPrice, "en")} in US vs ${formatUsd(medicine.indiaPrice, "en")} in India. Uses, dosage, side effects.`,
       type: "article",
       siteName: "Jivan",
-      images: [{ url: "/og-image.svg", width: 1200, height: 630, alt: `${medicine.name} price comparison` }],
+      images: [{ url: "/og-image.png", width: 1200, height: 630, alt: `${medicine.name} price comparison` }],
     },
     twitter: {
       card: "summary_large_image",
       title: `${medicine.name} — ${savings}% cheaper in India`,
       description: `US price: ${formatUsd(medicine.usEuPrice, "en")} → India: ${formatUsd(medicine.indiaPrice, "en")}`,
-      images: ["/og-image.svg"],
+      images: ["/og-image.png"],
     },
   };
 }
@@ -83,6 +81,7 @@ export default async function MedicineDetailPage({ params }: { params: Promise<P
   const alternatives = alternativeCandidates
     .filter((alternative) => medicineDetailSlugs.has(alternative.slug))
     .slice(0, 6);
+  const relatedMedicines = await getRelatedVerifiedMedicines(medicine, 8);
   const savings = savingsPercent(medicine.usEuPrice, medicine.indiaPrice);
 
   const productSchema = {
@@ -102,7 +101,7 @@ export default async function MedicineDetailPage({ params }: { params: Promise<P
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/${locale}/` },
-      { "@type": "ListItem", position: 2, name: "Medicines", item: `${SITE_URL}/${locale}/search/` },
+      { "@type": "ListItem", position: 2, name: "Medicines", item: `${SITE_URL}/${locale}/medicines/` },
       { "@type": "ListItem", position: 3, name: medicine.name },
     ],
   };
@@ -132,7 +131,7 @@ export default async function MedicineDetailPage({ params }: { params: Promise<P
           <nav className="flex flex-wrap items-center gap-2 text-xs text-ink-400">
             <Link href={`/${locale}`} className="hover:text-mint-300">{ui(locale, P.artBreadcrumbHome)}</Link>
             <span>/</span>
-            <Link href={`/${locale}#catalog`} className="hover:text-mint-300">{ui(locale, P.searchLiveLookup) ? "Catalog" : "Catalog"}</Link>
+            <Link href={`/${locale}/medicines`} className="hover:text-mint-300">Medicines</Link>
             <span>/</span>
             <span className="text-ink-200">{medicine.genericSalt}</span>
           </nav>
@@ -264,6 +263,34 @@ export default async function MedicineDetailPage({ params }: { params: Promise<P
               </div>
             </section>
           ) : null}
+
+          <section className="panel rounded-3xl p-6 sm:p-8">
+            <h2 className="text-xl font-bold text-ink-900">More researched medicines in {medicine.therapyArea}</h2>
+            <p className="mt-2 text-sm text-ink-600">
+              Other hand-checked comparisons from the same therapy area, highest saving first. Each page shows the salt, strength, manufacturer and the price basis.
+            </p>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              {relatedMedicines.map((item) => (
+                <Link
+                  key={item.id}
+                  href={`/${locale}/medicine/${item.slug}`}
+                  className="flex items-center justify-between gap-3 rounded-2xl border border-ink-100 p-4 transition hover:border-mint-500/40 hover:bg-mint-500/5"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-ink-900">{item.name}</p>
+                    <p className="truncate text-xs text-ink-400">{item.genericSalt} · {item.form} · {item.company}</p>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <p className="text-sm font-bold text-mint-600">{formatUsd(item.indiaPrice, locale)}</p>
+                    <p className="text-xs text-ink-400 line-through">{formatUsd(item.usEuPrice, locale)}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+            <Link href={`/${locale}/medicines`} className="mt-5 inline-flex text-sm font-semibold text-mint-600 underline-offset-4 hover:underline">
+              Browse all medicines A–Z →
+            </Link>
+          </section>
         </div>
 
         <aside className="space-y-5">
