@@ -23,6 +23,28 @@ Read that table as: *the site is finished and crawlable, but nothing outside the
 
 ---
 
+## This is a migration, not a launch
+
+`jivanrx.online` previously served an earlier, incomplete build on Netlify — the repository still carries `netlify/database/migrations/2026-09*` from that period, and that deployment is gone (the old host name returns "Site not found"). Moving a domain between hosts is invisible to Google: a site is identified by its domain, not by the machine serving it, so nothing is reset, no reputation is lost and there is no penalty to clear. The domain is actually slightly better off than a brand-new one, because it has DNS and crawl history.
+
+What the old attempt *does* leave behind is four specific pieces of residue:
+
+| Residue from the old host | Why it matters | What to do |
+|---|---|---|
+| The old `*.netlify.app` address, **if the site still exists there** | A second live copy of the site competes with the real one and can be the copy Google indexes | Delete that Netlify site, or add a redirect there to `https://jivanrx.online`. Then search `site:<old-subdomain>` to confirm it disappears |
+| Search Console verification done on Netlify (HTML file or meta tag) | The file no longer exists, so the property can drop to "verification expired" | Re-verify with the DNS TXT method (section 1). Do **not** create a second property |
+| A sitemap submitted from the old build | If it lists old URLs it reports "Couldn't fetch" and clutters the report | Remove it from the old property; submit `sitemap.xml` in the Domain property (section 2) |
+| Old URLs that are now 404 | Every link, bookmark and social post from that period is dead | `_redirects` now 301s the locale-less shapes — `/medicines/` → `/en/medicines/`, `/articles/*` → `/en/articles/*` |
+
+Two further points:
+
+- If the old host served `http://` only, check **Cloudflare → SSL/TLS → Edge Certificates → Always Use HTTPS: On** (and *Automatic HTTPS Rewrites* too). Today `http://jivanrx.online` and `https://jivanrx.online` must be one URL, not two.
+- If any URL from the old build is *identical* to a URL today (the home page `/`, for example), the verdict Google reached about the old, thinner version stays attached to it until the next crawl. That is another reason to request indexing for `/en/` rather than waiting: a fresh crawl replaces the old judgement.
+
+Old pages that are genuinely gone should 404, not redirect — Google drops them in a few weeks and there is nothing to clean up in Search Console.
+
+---
+
 ## Start here — the four actions, in this order
 
 | # | Action | Where | Time | Repeats? |
@@ -96,6 +118,7 @@ Cloudflare sits in front of the site; its defaults are fine, but check these onc
 - **Security → Bots**: "Block AI bots" / "AI Labyrinth" are fine — they do not apply to Googlebot's search crawler. Do **not** enable rules that challenge *verified* bots.
 - **Security → Events**: filter by user agent `Googlebot` after a week. Every row should be "Allow"; any "Managed Challenge"/"Block" means a WAF or rate-limit rule needs an exception for verified bots.
 - **Speed → Optimization → Crawler Hints**: turn **on**. It is free and tells Bing/IndexNow-based engines when pages change.
+- **SSL/TLS → Edge Certificates → Always Use HTTPS**: **On**, plus *Automatic HTTPS Rewrites*. One URL per page, not two.
 - **Workers & Pages → jivan-medicine → Custom domains**: `jivanrx.online` and `www.jivanrx.online` both attached.
 - **Rules → Redirect Rules → Create rule → template "Redirect from WWW to Root"** (one click, free): today `https://www.jivanrx.online/…` serves a full second copy of the site with a 200. Every page declares the apex URL as canonical, so Google will consolidate anyway, but a 301 stops the crawler from spending time on the duplicate host. (`_redirects` files on Pages cannot express host-level rules, which is why this lives in the dashboard.)
 

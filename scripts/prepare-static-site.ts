@@ -163,6 +163,23 @@ for (const locale of LOCALES) {
     }
   }
 }
+
+// Locale-less URL shapes. The site was served from an earlier Netlify
+// deployment before it moved to Cloudflare Pages on the same domain, and a
+// link, bookmark or social post from that period points at /medicines/ rather
+// than /en/medicines/. Those requests would otherwise 404. English is the
+// indexable locale, so it is the correct target for every bare path; none of
+// these prefixes exist at the site root today, so no live URL is affected.
+for (const path of LOCALIZED_STATIC_PATHS) {
+  if (!path) continue;
+  for (const trailingSlash of [false, true]) {
+    const slash = trailingSlash ? "/" : "";
+    redirectLines.push(`/${path}${slash} /en/${path}/ 301`);
+  }
+}
+for (const section of ["articles", "surgeries", "medicine"]) {
+  redirectLines.push(`/${section}/* /en/${section}/:splat 301`);
+}
 writeFileSync(join(publicDirectory, "_redirects"), `${redirectLines.join("\n")}\n`);
 
 // robots.txt is generated so the Sitemap directive can never drift from the

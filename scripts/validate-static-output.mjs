@@ -59,6 +59,34 @@ const keyValue = readFileSync(join(publicDir, keyName), "utf8").trim();
 assert(keyValue === keyName.replace(/\.txt$/, ""), `public/${keyName} must contain exactly its own filename without .txt.`);
 assert(existsSync(join(outputDir, keyName)), `${keyName} was not copied into out/; IndexNow will reject submissions.`);
 
+// ── redirects must not shadow an exported page ──────────────────────────────
+// `_redirects` is evaluated before static assets on Pages, so a rule whose
+// source is also a real page would send visitors away from a page that exists.
+// The locale-less migration rules added in scripts/prepare-static-site.ts rely
+// on those paths never existing at the site root; this keeps that true.
+const redirectsPath = join(publicDir, "_redirects");
+assert(existsSync(redirectsPath), "public/_redirects is missing; run the static-site preparation first.");
+const redirectSources = readFileSync(redirectsPath, "utf8")
+  .split("\n")
+  .map((line) => line.trim())
+  .filter((line) => line && !line.startsWith("#"))
+  .map((line) => line.split(/\s+/)[0]);
+assert(redirectSources.length > 0, "public/_redirects contains no rules.");
+
+for (const source of redirectSources) {
+  if (source.endsWith("/*")) {
+    const root = source.slice(1, -2);
+    assert(
+      !existsSync(join(outputDir, root)),
+      `_redirects splat /${root}/* would shadow the exported directory out/${root}/.`,
+    );
+    continue;
+  }
+  const relative = source.replace(/^\/+|\/+$/g, "");
+  const asPage = relative ? join(outputDir, relative, "index.html") : join(outputDir, "index.html");
+  assert(!existsSync(asPage), `_redirects rule for ${source} would shadow the exported page out/${relative || ""}.`);
+}
+
 // ── sitemap index → child sitemaps ──────────────────────────────────────────
 const indexPath = join(publicDir, "sitemap.xml");
 assert(existsSync(indexPath), "public/sitemap.xml is missing; run the sitemap build first.");
