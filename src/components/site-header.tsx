@@ -6,6 +6,7 @@ import { useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 import { DarkModeToggle } from "@/components/dark-mode-toggle";
 import { TopSearch } from "@/components/top-search";
+import { localeLinkRel } from "@/lib/seo";
 
 type NavItem = { href: string; label: string };
 
@@ -120,6 +121,7 @@ export function SiteHeader({
                   key={code}
                   href={`/${code}`}
                   hrefLang={code}
+                  rel={localeLinkRel(code)}
                   onClick={() => setOpen(false)}
                   className="rounded-lg bg-ink-50 px-2.5 py-1.5 text-[11px] font-semibold uppercase text-ink-600"
                 >
