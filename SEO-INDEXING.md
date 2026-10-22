@@ -16,6 +16,9 @@ Canonical domain: **`https://jivanrx.online`** (set the `www` → root redirect 
 | Structured data | `Organization`, `WebSite`, `FAQPage` on the home page; `Article` + `FAQPage` + `BreadcrumbList` on guides; `Drug` + `BreadcrumbList` on medicine pages; `MedicalProcedure` on operation pages |
 | Non-English locales | Live but `noindex, follow` (untranslated duplicate content) |
 | `https://www.jivanrx.online/` | **Serves a full duplicate copy with a 200, not a 301** — needs the Redirect Rule in section 4 |
+| Google verification | DNS TXT record **already present**: `google-site-verification=6-XhbIQowQitJh0oL5-4p87OU43v0Nv7q1OS5UU3oyo` — a Domain property was already set up for this domain, so section 1 is a check, not a setup |
+| `http://jivanrx.online/…` | **Already 301s to `https://`** — Always Use HTTPS is on, one URL per page |
+| IndexNow key file | **404 — not deployed yet.** Goes live when PR #7 merges and `main` deploys |
 | **Pages in Google's index** | **0** — a `site:jivanrx.online` query returns nothing |
 | **Inbound links found** | **0** |
 
@@ -25,56 +28,60 @@ Read that table as: *the site is finished and crawlable, but nothing outside the
 
 ## This is a migration, not a launch
 
-`jivanrx.online` previously served an earlier, incomplete build on Netlify — the repository still carries `netlify/database/migrations/2026-09*` from that period, and that deployment is gone (the old host name returns "Site not found"). Moving a domain between hosts is invisible to Google: a site is identified by its domain, not by the machine serving it, so nothing is reset, no reputation is lost and there is no penalty to clear. The domain is actually slightly better off than a brand-new one, because it has DNS and crawl history.
+`jivanrx.online` previously served an earlier, incomplete build on Netlify — the repository still carries `netlify/database/migrations/2026-09*` from that period. That Netlify project has since been **deleted**, so the only thing it left behind is old URLs and possibly an old Search Console verification. Moving a domain between hosts is invisible to Google: a site is identified by its domain, not by the machine serving it, so nothing is reset, no reputation is lost and there is no penalty to clear. The domain is actually slightly better off than a brand-new one, because it has DNS and crawl history.
 
-What the old attempt *does* leave behind is four specific pieces of residue:
+What the old attempt leaves behind is four things worth checking. Two are closed, one is fixed in code, and one is a question only you can answer in the Search Console UI:
 
-| Residue from the old host | Why it matters | What to do |
+| Residue from the old host | Why it matters | Status |
 |---|---|---|
-| The old `*.netlify.app` address, **if the site still exists there** | A second live copy of the site competes with the real one and can be the copy Google indexes | Delete that Netlify site, or add a redirect there to `https://jivanrx.online`. Then search `site:<old-subdomain>` to confirm it disappears |
-| Search Console verification done on Netlify (HTML file or meta tag) | The file no longer exists, so the property can drop to "verification expired" | Re-verify with the DNS TXT method (section 1). Do **not** create a second property |
-| A sitemap submitted from the old build | If it lists old URLs it reports "Couldn't fetch" and clutters the report | Remove it from the old property; submit `sitemap.xml` in the Domain property (section 2) |
-| Old URLs that are now 404 | Every link, bookmark and social post from that period is dead | `_redirects` now 301s the locale-less shapes — `/medicines/` → `/en/medicines/`, `/articles/*` → `/en/articles/*` |
+| The old `*.netlify.app` address, if the site still existed there | A second live copy of the site competes with the real one and can be the copy Google indexes | **Resolved** — the Netlify project was deleted on 22 Oct 2026. Nothing to redirect, nothing competing |
+| Search Console verification done on Netlify (HTML file or meta tag) | The file no longer exists, so the property can drop to "verification expired" | **Check the property type.** A DNS TXT record for this domain is already live, so the *Domain* property verifies without any file. A URL-prefix property verified by HTML tag has no file on the new host — delete it rather than rescue it (section 1) |
+| A sitemap submitted from the old build | If it lists old URLs it reports "Couldn't fetch" and clutters the report | **Remove it** if it exists, then submit `sitemap.xml` in the Domain property (section 2) |
+| Old URLs that are now 404 | Every link, bookmark and social post from that period is dead | **Fixed in code** — `_redirects` now 301s the locale-less shapes: `/medicines/` → `/en/medicines/`, `/articles/*` → `/en/articles/*` |
 
-Two further points:
+One further point: if any URL from the old build is *identical* to a URL today (the home page `/`, for example), the verdict Google reached about the old, thinner version stays attached to it until the next crawl. That is another reason to request indexing for `/en/` rather than waiting — a fresh crawl replaces the old judgement.
 
-- If the old host served `http://` only, check **Cloudflare → SSL/TLS → Edge Certificates → Always Use HTTPS: On** (and *Automatic HTTPS Rewrites* too). Today `http://jivanrx.online` and `https://jivanrx.online` must be one URL, not two.
-- If any URL from the old build is *identical* to a URL today (the home page `/`, for example), the verdict Google reached about the old, thinner version stays attached to it until the next crawl. That is another reason to request indexing for `/en/` rather than waiting: a fresh crawl replaces the old judgement.
-
-Old pages that are genuinely gone should 404, not redirect — Google drops them in a few weeks and there is nothing to clean up in Search Console.
+Old pages that are genuinely gone should 404, not redirect: Google drops them in a few weeks and there is nothing to clean up in Search Console.
 
 ---
 
-## Start here — the four actions, in this order
+## Start here — the five actions, in this order
 
 | # | Action | Where | Time | Repeats? |
 |---|---|---|---|---|
-| 1 | Verify the property | Search Console | 5 min | once |
+| 1 | **Confirm** the Domain property is verified (the DNS record is already live) | Search Console | 1 min | once |
 | 2 | Submit `sitemap.xml` | Search Console → Sitemaps | 30 sec | once |
-| 3 | Request indexing for the 8 hub pages | Search Console → URL Inspection | 5 min | once, then daily for new pages |
-| 4 | Push the URL list to Bing/Yandex/Naver | `npm run indexnow` | 30 sec | after each deploy |
+| 3 | Request indexing for the 8 hub pages | Search Console → URL Inspection | 5 min | once, then for new pages |
+| 4 | Merge the indexing PR, let `main` deploy, then push the URL list to Bing/Yandex/Naver | `npm run indexnow` | 1 min | after each deploy |
 | 5 | Earn 5 real inbound links | off-site | ongoing | this week |
 
 Everything else on this page is detail, verification and troubleshooting for those five rows.
 
 ---
 
-## 1. Verify the site in Google Search Console (one-time, ~5 minutes)
+## 1. Verify the site in Google Search Console
 
-1. Open <https://search.google.com/search-console> with the Google account that should own the property.
-2. Look at the property selector (top-left). If `jivanrx.online` is already listed, skip to section 2.
-3. Click **Add property → Domain** and enter `jivanrx.online` (no `https://`, no `www`). A Domain property covers http, https, www and every subdomain in one go, and it survives host changes.
-4. Google shows a TXT record like `google-site-verification=AbC123…`. Copy it.
-5. In the Cloudflare dashboard → the `jivanrx.online` zone → **DNS → Records → Add record**:
-   - Type: `TXT`
-   - Name: `@`
-   - Content: the full `google-site-verification=…` string
-   - TTL: Auto → **Save**
-6. Back in Search Console click **Verify**. DNS on Cloudflare propagates within a minute or two; if it fails, wait five minutes and retry.
+**The DNS record already exists.** `jivanrx.online` currently publishes
+`google-site-verification=6-XhbIQowQitJh0oL5-4p87OU43v0Nv7q1OS5UU3oyo`, so a Domain
+property has already been created for this domain at some point. The DNS TXT method
+is only available for **Domain** properties, which means the property type is already
+the right one — it covers http, https, www and every subdomain, and it cannot be
+broken by a change of host again.
 
-Fallback (HTML-tag method, needs a redeploy): choose **URL prefix** → `https://jivanrx.online/` → **HTML tag**, copy only the `content="…"` value, and either set it as the Cloudflare Pages build variable `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` or paste it into `GOOGLE_SITE_VERIFICATION_FALLBACK` in `src/lib/seo.ts`. Redeploy, then click Verify. The token is public by design, so committing it is fine.
+So this section is a three-point check, not a setup:
 
-> Prefer the Domain property. If you ever move from Cloudflare Pages to another host, or switch the canonical host to `www`, the Domain property keeps verifying and keeps your history — a URL-prefix property does not.
+1. Open <https://search.google.com/search-console> and look at the property selector.
+   - `jivanrx.online` (type **Domain**) listed → open it. If it says *Verified*, skip to section 2.
+   - Only a **URL-prefix** property (`https://jivanrx.online/`) exists → that one was verified from the old Netlify build and will expire now that the tag is gone. Add the Domain property alongside it, then delete the URL-prefix one; it covers nothing extra.
+   - Nothing listed → **Add property → Domain** → `jivanrx.online`. The TXT record already exists, so **Verify** succeeds immediately without touching DNS.
+2. Confirm both hosts behave: `https://jivanrx.online/` and `https://www.jivanrx.online/` both load (they do).
+3. If verification ever fails, check the record is still in **Cloudflare → DNS → Records** as a `TXT` on `@`.
+
+Fallback (HTML-tag method, needs a redeploy) — only for a URL-prefix property, since a
+Domain property already verifies by DNS: copy the `content="…"` value Google shows you
+and either set the Cloudflare Pages build variable `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`
+or paste it into `GOOGLE_SITE_VERIFICATION_FALLBACK` in `src/lib/seo.ts`, then redeploy.
+The token is public by design, so committing it is fine.
 
 ## 2. Submit the sitemap
 
