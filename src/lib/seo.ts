@@ -43,6 +43,24 @@ export function isSeoLocale(locale: string): locale is SeoLocale {
   return (INDEXABLE_LOCALES as readonly string[]).includes(locale);
 }
 
+/**
+ * `rel` for locale-switcher links.
+ *
+ * Every English page carries a language picker. Each non-indexable locale it
+ * links to is a `noindex` tree of up to 560 pages, so those four or five links
+ * per page open ~3,000 crawlable-but-never-indexable URLs to Googlebot. On a
+ * site with no crawl history that budget is spent instead of on the 561 pages
+ * that can actually rank — Search Console showed 117 `noindex` URLs evaluated
+ * before any English page was indexed.
+ *
+ * Returning `nofollow` keeps the switcher usable for people while telling
+ * crawlers not to spend budget behind it. It self-heals: once a locale is added
+ * to INDEXABLE_LOCALES this returns undefined and the link is followed again.
+ */
+export function localeLinkRel(locale: string): "nofollow" | undefined {
+  return isSeoLocale(locale) ? undefined : "nofollow";
+}
+
 function normalizedPath(path: string): string {
   const trimmed = path.trim().replace(/^\/+|\/+$/g, "");
   return trimmed ? `/${trimmed}/` : "/";

@@ -20,7 +20,15 @@ The build prepares the medicine slug manifest, redirects and `robots.txt`, gener
 npm ci
 npm run build
 npx wrangler pages deploy out --project-name jivan-medicine --branch main
+npm run indexnow
 ```
+
+The last line tells Bing, Yandex, Naver and Seznam which URLs changed (see
+`SEO-INDEXING.md` section 5). It only works once the deploy is live — the
+IndexNow key file `public/67f5864edcb2551c40c059108ee0a463.txt` has to be
+reachable at `https://jivanrx.online/67f5864edcb2551c40c059108ee0a463.txt`,
+otherwise the endpoint answers `403`. For a single changed page use
+`npm run indexnow -- --url <url>` instead of resubmitting all 561.
 
 For a preview, replace `main` with the branch name. Do not deploy the `out` directory until `npm run build` finishes successfully.
 

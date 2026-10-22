@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { primaryLocales, supportedLocales } from "@/lib/i18n";
-import { rootAlternates } from "@/lib/seo";
+import { localeLinkRel, rootAlternates } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Jivan — Medicine Access for Everyone",
@@ -36,7 +36,7 @@ export default function RootPage() {
         <nav aria-label="Choose a language" className="mt-8">
           <div className="flex flex-wrap gap-3">
             {primaryLocales.map((locale) => (
-              <Link key={locale} href={`/${locale}`} className="btn-primary" lang={locale} hrefLang={locale}>
+              <Link key={locale} href={`/${locale}`} className="btn-primary" lang={locale} hrefLang={locale} rel={localeLinkRel(locale)}>
                 {languageNames[locale] ?? locale.toUpperCase()}
               </Link>
             ))}
@@ -51,6 +51,7 @@ export default function RootPage() {
                 href={`/${locale}`}
                 lang={locale}
                 hrefLang={locale}
+                rel={localeLinkRel(locale)}
                 className="rounded-lg border border-white/15 px-2.5 py-1.5 text-xs font-semibold text-ink-200 transition hover:border-mint-200 hover:text-mint-200"
               >
                 {languageNames[locale] ?? locale.toUpperCase()}

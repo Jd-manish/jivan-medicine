@@ -8,7 +8,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SupportButton } from "@/components/support-button";
 import { BackToTop } from "@/components/back-to-top";
 import { isValidLocale, supportedLocales, t } from "@/lib/i18n";
-import { localizedRobots, TRANSLATED_UI_LOCALES } from "@/lib/seo";
+import { localeLinkRel, localizedRobots, TRANSLATED_UI_LOCALES } from "@/lib/seo";
 
 // Fully static — no DB, no server runtime needed.
 
@@ -123,6 +123,7 @@ export default async function LocaleLayout({
                   key={code}
                   href={`/${code}`}
                   hrefLang={code}
+                  rel={localeLinkRel(code)}
                   className="rounded-lg bg-ink-50 px-2 py-1 text-[11px] font-semibold uppercase text-ink-600 transition hover:bg-mint-500/10 hover:text-mint-600"
                 >
                   {code}
