@@ -87,6 +87,16 @@ The token is public by design, so committing it is fine.
 
 Search Console → **Sitemaps** → enter `sitemap.xml` → **Submit**.
 
+> **"Invalid sitemap address. Please enter a valid path to a sitemap in your site."**
+> This is a format error in the input box, not a problem with the site. Search Console never fetched anything. What to type depends on which property you are in:
+>
+> | Box looks like | Type exactly | Wrong input that causes the error |
+> |---|---|---|
+> | `https://jivanrx.online/` greyed out, then a short field (URL-prefix property) | `sitemap.xml` | pasting the full `https://jivanrx.online/sitemap.xml`, which doubles the domain |
+> | One empty field with a grey placeholder (Domain property) | `https://jivanrx.online/sitemap.xml` | typing only `sitemap.xml` |
+>
+> No leading slash, no trailing space, no `www`. If it still refuses, confirm in the property selector at the top that you are in `jivanrx.online` and not the old `jivan.online` property.
+
 `https://jivanrx.online/sitemap.xml` is a sitemap index that points at four child sitemaps. Within a day the Sitemaps report should show status **Success** for each:
 
 | Child sitemap | URLs | Contents |
