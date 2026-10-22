@@ -16,7 +16,7 @@ Canonical domain: **`https://jivanrx.online`** (set the `www` → root redirect 
 | Structured data | `Organization`, `WebSite`, `FAQPage` on the home page; `Article` + `FAQPage` + `BreadcrumbList` on guides; `Drug` + `BreadcrumbList` on medicine pages; `MedicalProcedure` on operation pages |
 | Non-English locales | Live but `noindex, follow` (untranslated duplicate content) |
 | `https://www.jivanrx.online/` | **Serves a full duplicate copy with a 200, not a 301** — needs the Redirect Rule in section 4 |
-| Google verification | DNS TXT record **already present**: `google-site-verification=6-XhbIQowQitJh0oL5-4p87OU43v0Nv7q1OS5UU3oyo` — a Domain property was already set up for this domain, so section 1 is a check, not a setup |
+| Google verification | DNS TXT record **already present**: `google-site-verification=6-XhbIQowQitJh0oL5-4p87OU43v0Nv7q1OS5UU3oyo` — so a Domain property exists. The Sitemaps screen is showing a **URL-prefix** property (`https://jivanrx.online/`), which covers only that exact host — see section 1 |
 | `http://jivanrx.online/…` | **Already 301s to `https://`** — Always Use HTTPS is on, one URL per page |
 | IndexNow key file | **404 — not deployed yet.** Goes live when PR #7 merges and `main` deploys |
 | **Pages in Google's index** | **0** — a `site:jivanrx.online` query returns nothing |
@@ -61,20 +61,19 @@ Everything else on this page is detail, verification and troubleshooting for tho
 
 ## 1. Verify the site in Google Search Console
 
-**The DNS record already exists.** `jivanrx.online` currently publishes
-`google-site-verification=6-XhbIQowQitJh0oL5-4p87OU43v0Nv7q1OS5UU3oyo`, so a Domain
-property has already been created for this domain at some point. The DNS TXT method
-is only available for **Domain** properties, which means the property type is already
-the right one — it covers http, https, www and every subdomain, and it cannot be
-broken by a change of host again.
+**Two properties are involved, and they are not the same thing.**
 
-So this section is a three-point check, not a setup:
+`jivanrx.online` publishes the DNS record
+`google-site-verification=6-XhbIQowQitJh0oL5-4p87OU43v0Nv7q1OS5UU3oyo`. DNS TXT
+verification is only offered for **Domain** properties, so a Domain property exists
+alongside the **URL-prefix** property that the Sitemaps screen defaults to. Both are
+legitimate; only the Domain one covers the whole site.
 
 1. Open <https://search.google.com/search-console> and look at the property selector.
-   - `jivanrx.online` (type **Domain**) listed → open it. If it says *Verified*, skip to section 2.
-   - Only a **URL-prefix** property (`https://jivanrx.online/`) exists → that one was verified from the old Netlify build and will expire now that the tag is gone. Add the Domain property alongside it, then delete the URL-prefix one; it covers nothing extra.
+   - **Domain** property `jivanrx.online` listed and *Verified* → use it. It covers http, https, www and every subdomain, so it cannot be broken by a change of host.
+   - **URL-prefix** property `https://jivanrx.online/` → this is what the Sitemaps box belongs to. It covers only `https://jivanrx.online/…` — not `http://`, not `www`, not `jivan.online`.
    - Nothing listed → **Add property → Domain** → `jivanrx.online`. The TXT record already exists, so **Verify** succeeds immediately without touching DNS.
-2. Confirm both hosts behave: `https://jivanrx.online/` and `https://www.jivanrx.online/` both load (they do).
+2. If only the URL-prefix property exists, add the Domain property alongside it (same TXT record, instant verification). The two keep separate data; the Domain property is the one that survives host changes and reports the `www` duplicate.
 3. If verification ever fails, check the record is still in **Cloudflare → DNS → Records** as a `TXT` on `@`.
 
 Fallback (HTML-tag method, needs a redeploy) — only for a URL-prefix property, since a
@@ -87,8 +86,14 @@ The token is public by design, so committing it is fine.
 
 Search Console → **Sitemaps** → enter `sitemap.xml` → **Submit**.
 
+Confirmed 22 Oct 2026: the box is prefixed with `jivanrx.online` (URL-prefix property),
+so the field takes **only the path** — `sitemap.xml`. Typing the full URL there produces
+*"Invalid sitemap address. Please enter a valid path to a sitemap in your site."*
+Search Console rejects the string before it fetches anything, so that message says
+nothing about the site being broken.
+
 > **"Invalid sitemap address. Please enter a valid path to a sitemap in your site."**
-> This is a format error in the input box, not a problem with the site. Search Console never fetched anything. What to type depends on which property you are in:
+> A format error in the input box, not a problem with the site. What to type depends on which property you are in:
 >
 > | Box looks like | Type exactly | Wrong input that causes the error |
 > |---|---|---|
