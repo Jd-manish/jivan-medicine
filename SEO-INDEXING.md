@@ -86,11 +86,12 @@ The token is public by design, so committing it is fine.
 
 Search Console → **Sitemaps** → enter `sitemap.xml` → **Submit**.
 
-Confirmed 22 Oct 2026: the box is prefixed with `jivanrx.online` (URL-prefix property),
-so the field takes **only the path** — `sitemap.xml`. Typing the full URL there produces
-*"Invalid sitemap address. Please enter a valid path to a sitemap in your site."*
-Search Console rejects the string before it fetches anything, so that message says
-nothing about the site being broken.
+Confirmed 22 Oct 2026: the Sitemaps screen belongs to a **URL-prefix** property, so the
+field normally takes **only the path** — `sitemap.xml`. Search Console validates the
+string before it fetches anything, so *"Invalid sitemap address"* says nothing about the
+site being broken. Both `sitemap.xml` and the absolute URL have since been rejected in
+that screen, which is a known UI quirk rather than a site problem — and it does not
+block indexing (see the box below).
 
 > **"Invalid sitemap address. Please enter a valid path to a sitemap in your site."**
 > A format error in the input box, not a problem with the site. What to type depends on which property you are in:
@@ -101,6 +102,20 @@ nothing about the site being broken.
 > | One empty field with a grey placeholder (Domain property) | `https://jivanrx.online/sitemap.xml` | typing only `sitemap.xml` |
 >
 > No leading slash, no trailing space, no `www`. If it still refuses, confirm in the property selector at the top that you are in `jivanrx.online` and not the old `jivan.online` property.
+
+**If the field rejects every value, stop debugging it.** The submission is optional:
+
+1. `robots.txt` ends with `Sitemap: https://jivanrx.online/sitemap.xml`, and Google reads
+   `Sitemap:` lines from `robots.txt` on every crawl — the sitemap is discovered either
+   way. The Sitemaps report only reports what Google did with it.
+2. The action that actually gets pages indexed is **URL Inspection → Request indexing**
+   on `/en/`, `/en/medicines/`, `/en/articles/` and `/en/surgeries/`. Spend the five
+   minutes there instead.
+
+Strings to try, in order, stopping at the first that is accepted:
+`https://jivanrx.online/sitemap.xml`, then `sitemap.xml`, then `/sitemap.xml`. Type them
+rather than pasting — a pasted invisible character or trailing space produces the same
+"invalid address" message.
 
 `https://jivanrx.online/sitemap.xml` is a sitemap index that points at four child sitemaps. Within a day the Sitemaps report should show status **Success** for each:
 
