@@ -15,6 +15,7 @@ Canonical domain: **`https://jivanrx.online`** (set the `www` → root redirect 
 | `https://jivanrx.online/sitemap.xml` | Sitemap index → 4 child sitemaps, **561 URLs**, all reachable |
 | Structured data | `Organization`, `WebSite`, `FAQPage` on the home page; `Article` + `FAQPage` + `BreadcrumbList` on guides; `Drug` + `BreadcrumbList` on medicine pages; `MedicalProcedure` on operation pages |
 | Non-English locales | Live but `noindex, follow` (untranslated duplicate content) |
+| `https://www.jivanrx.online/` | **Serves a full duplicate copy with a 200, not a 301** — needs the Redirect Rule in section 4 |
 | **Pages in Google's index** | **0** — a `site:jivanrx.online` query returns nothing |
 | **Inbound links found** | **0** |
 
