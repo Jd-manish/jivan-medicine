@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 /**
@@ -47,6 +47,17 @@ assert(existsSync(robotsPath), "public/robots.txt is missing; run the static-sit
 const robots = readFileSync(robotsPath, "utf8");
 assert(robots.includes(`Sitemap: ${siteUrl}/sitemap.xml`), `robots.txt must advertise ${siteUrl}/sitemap.xml.`);
 assert(!/^Disallow:\s*\/\s*$/m.test(robots), "robots.txt blocks the whole site.");
+
+// ── IndexNow key file ───────────────────────────────────────────────────────
+// IndexNow (Bing/Yandex/Naver) rejects every submission for a host whose key
+// file is missing or whose contents do not match the key. Both the source and
+// the exported copy are checked so a silent deploy regression cannot break it.
+const keyFiles = readdirSync(publicDir).filter((name) => /^[a-f0-9]{8,128}\.txt$/.test(name));
+assert(keyFiles.length === 1, `Expected exactly one IndexNow key file (<key>.txt) in public/, found ${keyFiles.length}.`);
+const keyName = keyFiles[0];
+const keyValue = readFileSync(join(publicDir, keyName), "utf8").trim();
+assert(keyValue === keyName.replace(/\.txt$/, ""), `public/${keyName} must contain exactly its own filename without .txt.`);
+assert(existsSync(join(outputDir, keyName)), `${keyName} was not copied into out/; IndexNow will reject submissions.`);
 
 // ── sitemap index → child sitemaps ──────────────────────────────────────────
 const indexPath = join(publicDir, "sitemap.xml");

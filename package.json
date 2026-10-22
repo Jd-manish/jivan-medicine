@@ -7,12 +7,13 @@
     "build:sitemap": "tsx scripts/build-sitemap.ts",
     "build": "npm run prepare:static && npm run build:sitemap && next build && npm run validate:static",
     "validate:static": "node scripts/validate-static-output.mjs",
+    "indexnow": "node scripts/submit-indexnow.mjs",
     "start": "npx serve out",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "check:contrast": "node scripts/scan-contrast.mjs",
     "check": "npm run lint && npm run typecheck && npm run build",
-    "deploy:preview": "npm run build && npx wrangler pages deploy out --project-name jivan-medicine --branch arena/9d76890b-jivan-medicine"
+    "deploy:preview": "npm run build && npx wrangler pages deploy out --project-name jivan-medicine --branch arena/931811bd-jivan-medicine"
   },
   "dependencies": {
     "next": "16.4.0",
